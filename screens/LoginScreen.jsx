@@ -8,7 +8,7 @@ import {baseUrl} from '../constants/variables'
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import Tts from 'react-native-tts';
+// import Tts from 'react-native-tts';
 
 
 
@@ -229,7 +229,7 @@ export default function LoginScreen() {
         })
         if(data?.candidates[0]?.content?.parts[0]?.text){
 
-            Tts.speak(data?.candidates[0]?.content?.parts[0]?.text);
+            // Tts.speak(data?.candidates[0]?.content?.parts[0]?.text);
         }
 
     }

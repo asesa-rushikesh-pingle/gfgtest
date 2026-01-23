@@ -34,7 +34,7 @@ export default function ScanQr({navigation,route}) {
       if(isScanned){
         return
       }
-      Alert.alert('code scanned')
+      // Alert.alert('code scanned')
       setisScanned(true)
       console.log(`Scanned ${codes.length} codes!`)
       if(codes.length > 0){
@@ -64,7 +64,10 @@ export default function ScanQr({navigation,route}) {
       uri = input.url
       console.log(uri)
     }else{
-       uri = '/athlete/general-qr-login'
+      //  uri = '/athlete/general-qr-login'
+      Alert.alert('Failed to scan the QR')
+      navigation.navigate('CourseDetail')
+      return
     }
   
     let athleteCourseIddd = await AsyncStorage.getItem('athleteCourseIdForGeneralCheckin')

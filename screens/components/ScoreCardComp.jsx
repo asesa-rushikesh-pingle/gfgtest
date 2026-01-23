@@ -6,7 +6,9 @@ import { BlurView } from '@react-native-community/blur';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import RNPickerSelect from 'react-native-picker-select';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getData,postJSONData} from '../../helper/callApi'
+import {getData,postFormData,postJSONData} from '../../helper/callApi'
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+
 
 
 const { width } = Dimensions.get('window');
@@ -20,7 +22,7 @@ export default function ScoreCardComp({selectedDate,athleteCourseId,athleteCompl
 
   const navigation = useNavigation();
 
-  const [values, setValues] = useState(Array(10).fill(''));
+  const [values, setValues] = useState([{text : ''},{text : ''},{text : ''},{text : ''},{text : ''},{text : ''},{text : ''},{text : ''},{text : ''},{text : ''}]);
   const inputRefs = useRef([]);
 
   const [focusedIndex, setFocusedIndex] = useState(null);
@@ -31,14 +33,57 @@ export default function ScoreCardComp({selectedDate,athleteCourseId,athleteCompl
   const [catList, setCatList] = useState([])
   const [selectedCategoryId, setSelectedCategoryId] = useState('')
 
+  const [uploadedUri, setUploadedUri] = useState('')
+
+  const [isLoadinng, setIsLoadinng] = useState(false)
+
   const handleChange = (text, index) => {
+    console.log(values)
+    console.log('index is ',index)
+    
     setValues(prev => {
       const newValues = [...prev];
-      newValues[index] = text;
-      console.log('Updated values:', newValues);
-      return newValues;
+
+      let upValues = newValues?.map((ma,maindex)=>{
+        if(maindex == index){
+          return {...ma, text : text}
+        }else{
+          return {...ma, text : ma.text}
+        }
+
+      }) 
+      // console.log('newValues',newValues)
+     
+      // console.log('Updated values:', newValues);
+      console.log('updaTED',upValues)
+      return upValues;
     });
   };
+
+  // Take Photo
+const takePhoto = async (inndexx) => {
+  const result = await launchCamera({ mediaType: 'photo' });
+  if (result.assets && result.assets.length > 0) {
+    // uploadImage(result.assets[0].uri);
+    console.log(result.assets[0].uri)
+    setUploadedUri(result.assets[0].uri)
+
+    setValues((prevArr)=>{
+
+      let updated = prevArr?.map((it,itINNDEX)=>{
+        if(itINNDEX == inndexx){
+          return {...it, uriUploaded : {uri : result.assets[0].uri,  name: 'photo.jpg', type: 'image/jpeg',}}
+        }else{
+          return {...it}
+        }
+      })
+  
+      return updated
+    })
+  }
+
+
+};
 
      useEffect(() => {
           const controller = new AbortController();
@@ -103,25 +148,46 @@ export default function ScoreCardComp({selectedDate,athleteCourseId,athleteCompl
           let payoad = values?.map((itt,index)=>{
             return {
               "key": `Round ${index + 1}`,
-              "score": itt ? Number(itt) : null
+              "score": itt.text ? Number(itt.text) : null,
+              "image" : itt?.uriUploaded || null
             }
           })
           console.log(payoad)
-          // return
-          const branch = await AsyncStorage.getItem('branch_slug')
-          const respo = await postJSONData(branch,`/athlete/training/${updatingId ? 'update-score-card' : 'add-score-card'}`,{
-            "athlete_course_id": athleteCourseId,
-            "score_card_category_id": selectedCategoryId,
-            "score_card": payoad,
-            "athlete_completed_course_program_id": athleteCompletedCourseId,
-            "score_card_id": updatingId
+          // uriUploaded
+
+          let formData = new FormData()
+          formData.append('score_card_category_id',selectedCategoryId)
+          formData.append('athlete_course_id',athleteCourseId)
+          formData.append('athlete_completed_course_program_id',athleteCompletedCourseId)
+          formData.append('score_card_id',updatingId)
+
+          payoad?.forEach((itm,itmIndex)=>{
+            formData.append(`score_card[${itmIndex}][key]`,itm.key)
+            formData.append(`score_card[${itmIndex}][score]`,itm.score || 0)
+            if(itm?.image){
+              formData.append(`score_card[${itmIndex}][image]`,itm.image)
+            }
           })
+
+          console.log('formData',formData)
+
+
+
+          const branch = await AsyncStorage.getItem('branch_slug')
+          const respo = await postFormData(branch,`/athlete/training/${updatingId ? 'update-score-card' : 'add-score-card'}`,formData,setIsLoadinng)
+          // const respo = await postJSONData(branch,`/athlete/training/${updatingId ? 'update-score-card' : 'add-score-card'}`,{
+          //   "athlete_course_id": athleteCourseId,
+          //   "score_card_category_id": selectedCategoryId,
+          //   "score_card": payoad,
+          //   "athlete_completed_course_program_id": athleteCompletedCourseId,
+          //   "score_card_id": updatingId
+          // })
         
           if(respo.status){
             setVisible(false)
             setToggler(s=>!s)
             setSelectedCategoryId('')
-            setValues(Array(10).fill(''))
+            setValues(Array(10).fill({'text' : ''}))  
             setUpdatingId('')
           }
         }
@@ -197,9 +263,9 @@ export default function ScoreCardComp({selectedDate,athleteCourseId,athleteCompl
                                   setSelectedCategoryId(item.score_card_category_id)
                                   setValues(item.score_card?.map((element)=>{
                                     if(element.score){
-                                      return String(element.score)
+                                      return  {...element, text : String(element.score)}
                                     }else{
-                                      return ''
+                                      return {...element, text : ''}
                                     }
 
                                   }))
@@ -264,7 +330,7 @@ export default function ScoreCardComp({selectedDate,athleteCourseId,athleteCompl
           setVisible(true);
           setSelectedCategoryId('')
           setUpdatingId('')
-          setValues(Array(10).fill(''))
+          setValues(Array(10).fill({text : ''}))
           return;
           navigation.navigate('Home');
         }}
@@ -338,8 +404,10 @@ export default function ScoreCardComp({selectedDate,athleteCourseId,athleteCompl
        
        <View style={stylesNew.roundSection}>
               {values.map((val, index) => (
+                <View  key={`round-${index}`}>
+
                 <TouchableOpacity
-                  key={`round-${index}`}
+                  // key={`round-${index}`}
                   style={[
                     stylesNew.roundClick,
                     focusedIndex === index && stylesNew.activeBorder,
@@ -353,21 +421,47 @@ export default function ScoreCardComp({selectedDate,athleteCourseId,athleteCompl
                     placeholder="00"
                     keyboardType="numeric"
                     placeholderTextColor="#656565"
-                    value={val}
+                    value={val.text}
                     onFocus={() => setFocusedIndex(index)}
                     onBlur={() => setFocusedIndex(null)}
                     onChangeText={text => handleChange(text, index)}
                   />
                 </TouchableOpacity>
+
+                <TouchableOpacity style={[stylesNew.uploadbutton,{width : '100%', marginTop : 5}]} onPress={()=>{
+                takePhoto(index)
+              }}>
+                 <Image
+                  source={require('../../assets/images/drive_folder_upload.png')}
+                  style={{ width: 24, height: 24 }}
+                /> 
+                
+              </TouchableOpacity>
+              {val?.uriUploaded?.uri ?
+               <Image
+               source={{uri : val?.uriUploaded?.uri}}
+               style={{ width: '100%', height: 45, borderRadius : 10,marginTop : 5 }}
+             />  : val?.image_url ?
+             <Image
+             source={{uri : val?.image_url}}
+             style={{ width: '100%', height: 45, borderRadius : 10,marginTop : 5 }}
+           /> : null
+              }
+             
+                </View>
               ))}
             </View>
             <View style={stylesNew.saveContainer}>
-              <TouchableOpacity style={stylesNew.uploadbutton}>
-                <Image
+              {/* <TouchableOpacity style={stylesNew.uploadbutton} onPress={()=>{
+                // takePhoto()
+              }}>
+                 <Image
                   source={require('../../assets/images/drive_folder_upload.png')}
                   style={{ width: 24, height: 24 }}
-                />
-              </TouchableOpacity>
+                /> 
+                
+              </TouchableOpacity> */}
+             
               <TouchableOpacity onPress={()=>{
                 if(!selectedCategoryId){
                   Alert.alert('Choose category')
@@ -375,7 +469,11 @@ export default function ScoreCardComp({selectedDate,athleteCourseId,athleteCompl
                 }
         addScoreFn()
       }} style={{ flex : 1}}>
+        {isLoadinng ?
+        <Text style={{textAlign : 'center', padding : 12 , backgroundColor : '#EB6925', borderRadius : 10, color : 'black', fontSize : 16 , lineHeight : 22, fontWeight : '600'}}>{'Loading...'}</Text>
+        : 
         <Text style={{textAlign : 'center', padding : 12 , backgroundColor : '#EB6925', borderRadius : 10, color : 'black', fontSize : 16 , lineHeight : 22, fontWeight : '600'}}>{updatingId ? 'Update' : 'Save'}</Text>
+        }
       </TouchableOpacity>
             </View>
         
@@ -430,7 +528,7 @@ const stylesNew = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     rowGap: 12,
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 26,
   },
   roundClick: {

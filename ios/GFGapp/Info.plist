@@ -10,6 +10,11 @@
 <string>$(PRODUCT_NAME) needs access to your Microphone.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+<string>We need access to your photos to upload images</string>
+
+<key>NSCameraUsageDescription</key>
+<string>We need camera access to take photos</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
