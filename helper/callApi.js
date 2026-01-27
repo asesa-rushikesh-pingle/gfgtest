@@ -66,6 +66,8 @@ async function postJSONData(branch, url, JSONData) {
     }
     const data = await res.json();
 
+    console.log(data)
+
     if (data.status) {
       return data;
     } else {

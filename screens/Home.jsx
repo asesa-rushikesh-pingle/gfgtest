@@ -32,6 +32,8 @@ export default function Home({route}) {
 
   const isFocused = useIsFocused();
 
+  const [isApproved, setIsApproved] = useState(false)
+
 
   useEffect(() => {
     const controller = new AbortController();
@@ -42,9 +44,28 @@ export default function Home({route}) {
       controller.abort();
     }
   }, [isFocused]) 
+
+  useEffect(() => {
+    const controller = new AbortController();
+    if(isFocused){
+      checkIfUserActive(controller)
+    } 
+    return ()=>{
+      controller.abort();
+    }
+  }, [isFocused]) 
  
  
 
+  async function checkIfUserActive(controller) {
+    const branch = await AsyncStorage.getItem('branch_slug')
+    const respo = await getData(branch,'/athlete/check-athlete-active-status',{},controller)
+    if(respo.status){
+      console.log("user activity check",respo.data)
+      setIsApproved(respo.data.is_approved == 1 ? true : false)
+      
+    }
+  }
   async function getCourseDataFn(controller) {
     const branch = await AsyncStorage.getItem('branch_slug')
     const respo = await getData(branch,'/athlete/course',{},controller)
@@ -58,12 +79,27 @@ export default function Home({route}) {
       console.log("course details ",respo.data.course)
     }
   }
+
+  
   
   return (
     <View style={styles.parentWrapper}>
       <Header setSafeAreaHeight={setSafeAreaHeight} />
+      {isApproved && 
       <Footer />
-      <ScrollView style={{ paddingTop: safeAreaHeight }}>
+}
+     
+     
+     {!isApproved ? 
+ <ScrollView style={{ paddingTop: safeAreaHeight , height : 1400}}>
+ <View style={{padding : 16}}>
+   <Image source={require('../assets/images/hold.png')} style={{width : '100%', height : undefined, aspectRatio : 358/246}} />
+   <Text style={{textAlign : 'center', marginTop : 26, color : '#A8A8A8', fontSize : 20, fontWeight : '700'}}>Waiting for Approval</Text>
+   <Text style={{textAlign : 'center', marginTop : 26, color : '#656565', fontSize : 16, fontWeight : '600'}}>Your registration is under review.</Text>
+ </View>
+ </ScrollView>
+     : 
+     <ScrollView style={{ paddingTop: safeAreaHeight }}>
         <View style={{ paddingHorizontal: 16 }}>
           <View
             style={[
@@ -532,7 +568,7 @@ export default function Home({route}) {
             </View>
           </View>
         </View>
-      </ScrollView>
+      </ScrollView>}
     </View>
-  );
+  ); 
 }

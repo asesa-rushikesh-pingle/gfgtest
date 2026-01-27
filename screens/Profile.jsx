@@ -10,7 +10,7 @@ import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getData, postJSONData} from '../helper/callApi'
 import RNPickerSelect from 'react-native-picker-select';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 
 export default function Profile() {
@@ -22,6 +22,9 @@ export default function Profile() {
 
 
      const nav = useNavigation()
+      const isFocused = useIsFocused();
+        const [isApproved, setIsApproved] = useState(false)
+
 
 
      
@@ -43,6 +46,26 @@ export default function Profile() {
         controller.abort();
       }
     }, [])
+
+     useEffect(() => {
+        const controller = new AbortController();
+        if(isFocused){
+          checkIfUserActive(controller)
+        } 
+        return ()=>{
+          controller.abort();
+        }
+      }, [isFocused]) 
+
+      async function checkIfUserActive(controller) {
+        const branch = await AsyncStorage.getItem('branch_slug')
+        const respo = await getData(branch,'/athlete/check-athlete-active-status',{},controller)
+        if(respo.status){
+          console.log("user activity check",respo.data)
+          setIsApproved(respo.data.is_approved == 1 ? true : false)
+          
+        }
+      }
    
     async function getCourseInfo(controller) {
       const branch = await AsyncStorage.getItem('branch_slug')
@@ -66,7 +89,9 @@ export default function Profile() {
   return (
     <View style={styles.parentWrapper}>
     <TitleBar title={"Profile"} setSafeAreaHeight={setSafeAreaHeight}/>
+    {isApproved &&
     <Footer/>
+    }
       <ScrollView style={{paddingTop : safeAreaHeight}}>
 
         <View style={{paddingHorizontal : 16}}>
@@ -87,13 +112,19 @@ export default function Profile() {
                   <Text style={stylesNew.userName}>{athleteInfo?.first_name} {athleteInfo?.last_name}</Text>
                   <Text style={stylesNew.userContactnumber}>{athleteInfo?.mobile_no}</Text>
 
-                  <View style={stylesNew.approvedContainer}>
-                    <Image
-                      source={require('../assets/icons/check_box.png')}
-                      style={{ height: 18, width: 18 }}
-                    />
-                    <Text style={stylesNew.approvedText}>Approved</Text>
-                  </View>
+                 {isApproved ?
+                 <View style={stylesNew.approvedContainer}>
+                 <Image
+                   source={require('../assets/icons/check_box.png')}
+                   style={{ height: 18, width: 18 }}
+                 />
+                 <Text style={stylesNew.approvedText}>Approved</Text>
+               </View> : 
+               <View style={stylesNew.approvedContainer}>
+               
+               <Text style={[stylesNew.approvedText,{color : 'yellow'}]}>Waiting for Approval</Text>
+             </View>
+                 } 
                 </View>
               </View>
 

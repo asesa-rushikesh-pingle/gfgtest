@@ -308,18 +308,26 @@ export default function LoginScreen() {
                 <Text style={{backgroundColor : '#EB6925', borderRadius : 10, textAlign : 'center', padding : 10, color : 'white', fontSize : 16, fontWeight : '600', lineHeight : 22}}>Verify</Text>
              </TouchableOpacity>
              }
+
+                <TouchableOpacity onPress={()=>{
+                    nav.navigate('Register')
+                }}>
+                <Text style={{marginTop : 50, textAlign : 'center', color : '#EB6925', fontSize : 14, fontWeight : '700'}}>Register as Athlete</Text>
+                </TouchableOpacity>
            
 
            
         </View>
 
+     
 
-        <Button title='hieee'  onPress={()=>{
+
+        {/* <Button title='hieee'  onPress={()=>{
 setModalVisible(true)
 }}>
 
-</Button>
-<View style={{height : 50}}></View>
+</Button> */}
+{/* <View style={{height : 50}}></View> */}
         <Modal
           animationType="slide"
           transparent={true}

@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { BlurView } from "@react-native-community/blur";
 
 import LoginScreen from "./screens/LoginScreen"
+import Register from "./screens/Register"
 import Home from "./screens/Home"
 import CourseDetail from "./screens/CourseDetail"
 import Profile from "./screens/Profile"
@@ -133,6 +134,7 @@ export default function App() {
     <NavigationContainer >
     <Stack.Navigator initialRouteName={initialRoute} screenOptions={{headerShown : false,animation :'scale_from_center'}}>
     <Stack.Screen name="LoginScreen" component={LoginScreen} />
+    <Stack.Screen name="Register" component={Register} />
     <Stack.Screen name="Home" component={Home} />
     <Stack.Screen name="PsyReport" component={PsyReport} />
     <Stack.Screen name="CourseDetail" component={CourseDetail} />
