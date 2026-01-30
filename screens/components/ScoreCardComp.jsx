@@ -62,8 +62,13 @@ export default function ScoreCardComp({selectedDate,athleteCourseId,athleteCompl
 
   // Take Photo
 const takePhoto = async (inndexx) => {
-  const result = await launchCamera({ mediaType: 'photo' });
+
+  try {
+
+    const result = await launchCamera({ mediaType: 'photo' });
+  
   if (result.assets && result.assets.length > 0) {
+   
     // uploadImage(result.assets[0].uri);
     console.log(result.assets[0].uri)
     setUploadedUri(result.assets[0].uri)
@@ -81,6 +86,13 @@ const takePhoto = async (inndexx) => {
       return updated
     })
   }
+    
+  } catch (error) {
+    Alert.alert('in catch block')
+    
+  }
+  
+  
 
 
 };
@@ -263,8 +275,10 @@ const takePhoto = async (inndexx) => {
                                   setSelectedCategoryId(item.score_card_category_id)
                                   setValues(item.score_card?.map((element)=>{
                                     if(element.score){
+                                      // console.log({...element, text : String(element.score)})
                                       return  {...element, text : String(element.score)}
                                     }else{
+                                      // console.log({...element, text : ''})
                                       return {...element, text : ''}
                                     }
 
@@ -297,6 +311,14 @@ const takePhoto = async (inndexx) => {
                 <View key={inx} style={{padding : 5, borderRadius : 5, backgroundColor : '#383838', width : (Dimensions.get('window').width - 100) / 5 }}>
                 <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400',textAlign : 'center'}}>{el?.key}</Text>
                 <Text style={{color : 'white',marginTop : 2, fontSize : 16, fontWeight : '600',lineHeight : 22,textAlign : 'center'}}>{el?.score || '00'}</Text>
+                <Image
+               
+            //  source={{uri : 'https://vivopune.com/backend/public/products-images/x300-pro-10347361-1764826527_0.webp'}}
+             source={{uri : el?.image_url}}
+             style={{ width: '100%', height: 45, borderRadius : 10,marginTop : 5 }}
+             /> 
+                
+             {/* <Text>{el?.image_url}</Text> */}
                 </View>
               )
             })}
@@ -441,14 +463,20 @@ const takePhoto = async (inndexx) => {
                <Image
                source={{uri : val?.uriUploaded?.uri}}
                style={{ width: '100%', height: 45, borderRadius : 10,marginTop : 5 }}
-             />  : val?.image_url ?
-             <Image
-             source={{uri : val?.image_url}}
-             style={{ width: '100%', height: 45, borderRadius : 10,marginTop : 5 }}
-           /> : null
-              }
+              />  : val?.image_url ?
+              <Image
+              source={{uri : val?.image_url}}
+              style={{ width: '100%', height: 45, borderRadius : 10,marginTop : 5 }}
+              /> : null
+                }
              
-                </View>
+               {/* <Image
+             source={{uri : val?.image_url}}
+             style={{ width: '100%', height: 30, borderRadius : 10,marginTop : 5 }}
+             /> 
+             <Text style={{color : 'pink', width : 40, height : 40}}>{val?.image_url}</Text> */}
+             </View>
+
               ))}
             </View>
             <View style={stylesNew.saveContainer}>

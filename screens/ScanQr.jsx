@@ -54,6 +54,11 @@ export default function ScanQr({navigation,route}) {
     let input = JSON.parse(scanedJson)
     let uri = ''
     if(input.branch_slug){
+      if(isScaLane){
+        Alert.alert('Failed to scan the Lane QR')
+        navigation.navigate('CourseDetail')
+        return
+      }
       uri = '/athlete/general-qr-login'
       if(input.branch_slug !== branch){
         Alert.alert('Failed to scan the QR')

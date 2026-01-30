@@ -218,7 +218,7 @@ formData.append("permanant_pin_code", perZipCode);
           // alert(`Success: ${data.razorpay_payment_id}`);
         }).catch((error) => {
           // handle failure
-          Alert.alert(`Error: ${error.code} | ${error.description}`)
+          // Alert.alert(`Error: ${error.code} | ${error.description}`)
           // alert(`Error: ${error.code} | ${error.description}`);
         });
         
