@@ -469,7 +469,7 @@ export default function Home({route}) {
           </View>
         </View>
 
-        <PsycologicalSkills isTrstPer={courseObj?.test_permission == 1 ? true : false} testArr={courseObj?.test_percentage}/>
+        <PsycologicalSkills isTrstPer={courseObj?.test_permission == 1 ? true : false} testQuestios={courseObj?.courseObject?.psychological_questions} testArr={courseObj?.test_percentage}/>
 
         {/* mood box  */}
         <View style={styles.moodBoxWaraper}>

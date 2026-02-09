@@ -101,7 +101,7 @@ export default function PsyReport({route}) {
       },controller)
       if(respo.status){
         console.log('report respo ', respo)
-        setReportObj(respo.data.reports[0])
+        setReportObj(respo.data.report)
         
       } 
     }
@@ -135,7 +135,7 @@ export default function PsyReport({route}) {
 
         <View style={{paddingHorizontal : 16}}>
           <Text style={{fontSize : 12, fontWeight : '400',marginTop : 16, color : '#A8A8A8'}}>
-          Feb 15, 2024 
+          {reportObj?.test_given_date}
           </Text>
 
           <View style={{ marginTop : 26 }}>
@@ -145,7 +145,7 @@ export default function PsyReport({route}) {
               { width: Dimensions.get('window').width - 32 },
             ]}
           >
-            <Text style={styles.proTitle}>{getGrade((Number(reportObj?.total_percentage) * 84)/100)}</Text>
+            <Text style={styles.proTitle}>{reportObj?.grade}</Text>
             <Text style={styles.percenten}>{Number(reportObj?.total_percentage).toFixed(0)}% </Text> 
             <View
               style={{
@@ -242,76 +242,35 @@ export default function PsyReport({route}) {
                 <Text style={{fontSize : 10, color : '#A8A8A8', fontWeight : '400'}}>20 %</Text>
                 <Text style={{fontSize : 10, color : '#A8A8A8', fontWeight : '400'}}>00 %</Text>
             </View>
-            <View style={{flex : 1, height : 200, borderLeftWidth : .5,borderBottomWidth : .5, borderColor : '#848484', flexDirection : 'row', alignItems : 'flex-end', justifyContent : 'space-evenly'}}>
-                <View style={{width : 33, height :  Number(reportObj?.total_coachability_percentage)?.toFixed(0) * 2, backgroundColor : '#008644'}}></View>
-                <View style={{width : 33, height :  Number(reportObj?.total_concentartion_percentage)?.toFixed(0) * 2, backgroundColor : '#FFD04D'}}></View>
-                <View style={{width : 33, height :  Number(reportObj?.total_confidence_percentage)?.toFixed(0) * 2, backgroundColor : '#EB6925'}}></View>
-                <View style={{width : 33, height :  Number(reportObj?.total_coping_percentage)?.toFixed(0) * 2, backgroundColor : '#FF928A'}}></View>
-                <View style={{width : 33, height :  Number(reportObj?.total_freedom_percentage)?.toFixed(0) * 2, backgroundColor : '#D9B8FF'}}></View>
-                <View style={{width : 33, height :  Number(reportObj?.total_goal_percentage)?.toFixed(0) * 2, backgroundColor : '#537FF1'}}></View>
-                <View style={{width : 33, height :  Number(reportObj?.total_goal_percentage)?.toFixed(0) * 2, backgroundColor : '#537FF1'}}></View>
-                <View style={{width : 33, height : Number(reportObj?.total_peaking_percentage)?.toFixed(0) * 2, backgroundColor : 'gray'}}></View>
-            </View>
+            <ScrollView horizontal style={{flex : 1, height : 200, borderLeftWidth : .5,borderBottomWidth : .5, borderColor : '#848484', 
+              // flexDirection : 'row', 
+              // alignItems : 'flex-end', 
+              // justifyContent : 'space-evenly'
+              }}>
+              {reportObj?.details?.map((bar,barindex)=>{
+                return(
+                  <View key={barindex} style={{ marginTop : 'auto', width : 33, marginLeft : 10, height :  Number(bar?.percentage)?.toFixed(0) * 2, backgroundColor : bar.color}}></View>
+                )
+              })}
+           
+              
+            </ScrollView>
 
           </View>
 
           <View style={{marginTop : 26}}>
 
-            <View style={{flexDirection : 'row', borderBottomWidth : .3, borderColor : '#383838',alignItems : 'center', justifyContent : 'space-between'}}>
-              <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 16}} >
-              <View style={{width : 10, height :  10,borderRadius : 10, backgroundColor : '#008644'}}></View>
-              <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400', lineHeight :28 }}>Coachability</Text>
-              </View>
-              <Text style={{color : '#fff', fontSize : 16, fontWeight : '600', lineHeight :28 }}>{Number(reportObj?.total_coachability_percentage)?.toFixed(0)}%</Text>
-            </View>
-            <View style={{flexDirection : 'row', borderBottomWidth : .3, borderColor : '#383838',alignItems : 'center', justifyContent : 'space-between'}}>
-              <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 16}} >
-              <View style={{width : 10, height :  10,borderRadius : 10, backgroundColor : '#FFD04D'}}></View> 
-              <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400', lineHeight :28 }}>Concentration</Text>
-              </View>
-              <Text style={{color : '#fff', fontSize : 16, fontWeight : '600', lineHeight :28 }}>{Number(reportObj?.total_concentartion_percentage)?.toFixed(0)}%</Text>
-
-            </View>
-            <View style={{flexDirection : 'row', borderBottomWidth : .3, borderColor : '#383838',alignItems : 'center', justifyContent : 'space-between'}}>
-              <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 16}} >
-              <View style={{width : 10, height :  10,borderRadius : 10, backgroundColor : '#EB6925'}}></View>
-              <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400', lineHeight :28 }}>Confidence</Text>
-              </View>
-              <Text style={{color : '#fff', fontSize : 16, fontWeight : '600', lineHeight :28 }}>{Number(reportObj?.total_confidence_percentage)?.toFixed(0)}%</Text>
-
-            </View>
-            <View style={{flexDirection : 'row', borderBottomWidth : .3, borderColor : '#383838',alignItems : 'center', justifyContent : 'space-between'}}>
-              <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 16}} >
-              <View style={{width : 10, height :  10,borderRadius : 10, backgroundColor : '#FF928A'}}></View>
-              <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400', lineHeight :28 }}>Coping With Adversity</Text>
-              </View>
-              <Text style={{color : '#fff', fontSize : 16, fontWeight : '600', lineHeight :28 }}>{Number(reportObj?.total_coping_percentage)?.toFixed(0)}%</Text>
-
-            </View>
-            <View style={{flexDirection : 'row', borderBottomWidth : .3, borderColor : '#383838',alignItems : 'center', justifyContent : 'space-between'}}>
-              <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 16}} >
-              <View style={{width : 10, height :  10,borderRadius : 10, backgroundColor : '#D9B8FF'}}></View>
-              <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400', lineHeight :28 }}>Freedom From Worry</Text>
-              </View>
-              <Text style={{color : '#fff', fontSize : 16, fontWeight : '600', lineHeight :28 }}>{Number(reportObj?.total_freedom_percentage)?.toFixed(0)}%</Text>
-
-            </View>
-            <View style={{flexDirection : 'row', borderBottomWidth : .3, borderColor : '#383838',alignItems : 'center', justifyContent : 'space-between'}}>
-              <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 16}} >
-              <View style={{width : 10, height :  10,borderRadius : 10, backgroundColor : '#537FF1'}}></View>
-              <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400', lineHeight :28 }}>Goal Setting</Text>
-              </View>
-              <Text style={{color : '#fff', fontSize : 16, fontWeight : '600', lineHeight :28 }}>{Number(reportObj?.total_goal_percentage)?.toFixed(0)}%</Text>
-
-            </View>
-            <View style={{flexDirection : 'row', borderBottomWidth : .3, borderColor : '#383838',alignItems : 'center', justifyContent : 'space-between'}}>
-              <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 16}} >
-              <View style={{width : 10, height :  10,borderRadius : 10, backgroundColor : 'gray'}}></View>
-              <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400', lineHeight :28 }}>Peaking Under Pressure</Text>
-              </View>
-              <Text style={{color : '#fff', fontSize : 16, fontWeight : '600', lineHeight :28 }}>{Number(reportObj?.total_peaking_percentage)?.toFixed(0)}%</Text>
-
-            </View>
+          {reportObj?.details?.map((bar,barindex)=>{
+                return(
+                  <View key={barindex} style={{flexDirection : 'row', borderBottomWidth : .3, borderColor : '#383838',alignItems : 'center', justifyContent : 'space-between'}}>
+                  <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 16}} >
+                  <View style={{width : 10, height :  10,borderRadius : 10, backgroundColor : bar.color}}></View>
+                  <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400', lineHeight :28 }}>{bar?.finding_name}</Text>
+                  </View>
+                  <Text style={{color : '#fff', fontSize : 16, fontWeight : '600', lineHeight :28 }}>{Number(bar?.percentage)?.toFixed(0)}%</Text>
+                </View>
+                )
+              })}
 
           </View>
 
@@ -321,32 +280,16 @@ export default function PsyReport({route}) {
           </Text>
 
           <View style={{marginTop : 16, padding : 10, borderRadius : 16, borderColor : '#383838', borderWidth : .5}}>
-            <Text style={{fontSize : 16, fontWeight : '500',marginBottom : 6, color : '#fff'}}>Coping with  Adversity</Text>
-            <Text style={{fontSize : 14, fontWeight : '400',lineHeight : 22, color : '#A8A8A8'}}>Ability to stay calm confident and focused in tough situations</Text>
-            <View style={{height : .5, backgroundColor : '#383838',marginTop : 8,marginBottom : 8}}></View>
 
-            <Text style={{fontSize : 16, fontWeight : '500',marginBottom : 6, color : '#fff'}}>Coachability</Text>
-            <Text style={{fontSize : 14, fontWeight : '400',lineHeight : 22, color : '#A8A8A8'}}>Ability to stay calm confident and focused in tough situations</Text>
-            <View style={{height : .5, backgroundColor : '#383838',marginTop : 8,marginBottom : 8}}></View>
-
-            <Text style={{fontSize : 16, fontWeight : '500',marginBottom : 6, color : '#fff'}}>Concentration</Text>
-            <Text style={{fontSize : 14, fontWeight : '400',lineHeight : 22, color : '#A8A8A8'}}>Ability to stay calm confident and focused in tough situations</Text>
-            <View style={{height : .5, backgroundColor : '#383838',marginTop : 8,marginBottom : 8}}></View>
-
-            <Text style={{fontSize : 16, fontWeight : '500',marginBottom : 6, color : '#fff'}}>Confidence</Text>
-            <Text style={{fontSize : 14, fontWeight : '400',lineHeight : 22, color : '#A8A8A8'}}>Ability to stay calm confident and focused in tough situations</Text>
-            <View style={{height : .5, backgroundColor : '#383838',marginTop : 8,marginBottom : 8}}></View>
-
-            <Text style={{fontSize : 16, fontWeight : '500',marginBottom : 6, color : '#fff'}}>Peaking under Pressure</Text>
-            <Text style={{fontSize : 14, fontWeight : '400',lineHeight : 22, color : '#A8A8A8'}}>Ability to stay calm confident and focused in tough situations</Text>
-            <View style={{height : .5, backgroundColor : '#383838',marginTop : 8,marginBottom : 8}}></View>
-
-            <Text style={{fontSize : 16, fontWeight : '500',marginBottom : 6, color : '#fff'}}>Goal Setting</Text>
-            <Text style={{fontSize : 14, fontWeight : '400',lineHeight : 22, color : '#A8A8A8'}}>Ability to stay calm confident and focused in tough situations</Text>
-            <View style={{height : .5, backgroundColor : '#383838',marginTop : 8,marginBottom : 8}}></View>
-
-            <Text style={{fontSize : 16, fontWeight : '500',marginBottom : 6, color : '#fff'}}>Freedom from Worry</Text>
-            <Text style={{fontSize : 14, fontWeight : '400',lineHeight : 22, color : '#A8A8A8'}}>Ability to stay calm confident and focused in tough situations</Text>
+          {reportObj?.details?.map((bar,barindex,arr)=>{
+                return(
+                  <View key={barindex}>
+                  <Text style={{fontSize : 16, fontWeight : '500',marginBottom : 6, color : '#fff'}}>{bar.finding_name}</Text>
+                  <Text style={{fontSize : 14, fontWeight : '400',lineHeight : 22, color : '#A8A8A8'}}>{bar?.finding_description || ''}</Text>
+                  <View style={{height : .5, backgroundColor : (barindex == (arr.length - 1)) ? 'black' :'#383838',marginTop : 8,marginBottom : (barindex == (arr.length - 1)) ? 0 :8}}></View>
+                  </View>
+                )
+              })}
 
           </View>
 
