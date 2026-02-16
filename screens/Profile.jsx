@@ -303,7 +303,11 @@ export default function Profile() {
             await AsyncStorage.removeItem('branch_name');
             await AsyncStorage.removeItem('branch_slug');
 
-            nav.navigate('LoginScreen')
+            // nav.navigate('LoginScreen')
+            nav.reset({
+              index: 0,
+              routes: [{ name: "LoginScreen" }],
+            });
           }}>
             <View style={stylesNew.billingConatiner}>
               {/* <Image

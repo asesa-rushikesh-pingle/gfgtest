@@ -172,12 +172,12 @@ export default function Billing() {
                 </View>
                 <View style={stylesNew.viewInstalmentdetailssection}>
                   <Text style={stylesNew.recivedAmountText}>{Number(item.amount_received).toLocaleString('en-IN')}/-</Text>
-                  <TouchableOpacity>
+                  {/* <TouchableOpacity>
                     <Image
                       source={require('../assets/icons/eye.png')}
                       style={{ height: 24, width: 24 }}
                     />
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
               </View>
             ))}

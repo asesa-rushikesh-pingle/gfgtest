@@ -100,7 +100,7 @@ export default function LoginScreen() {
                     await AsyncStorage.setItem('profile_pic_url', data.data.profile_pic_url);
                 }
                 await AsyncStorage.setItem('first_name', data.data.first_name);
-                await AsyncStorage.setItem('last_name', data.data.last_name);
+                await AsyncStorage.setItem('last_name', data.data.last_name || '');
                 await AsyncStorage.setItem('branch_name', data.data.branches[0].branch_name);
                 await AsyncStorage.setItem('branch_slug', data.data.branches[0].branch_slug);
                 nav.replace('Home');
@@ -249,16 +249,17 @@ export default function LoginScreen() {
      
     <View style={{height :  Dimensions.get('window').height}}>
      
-        <View style={{height  : 220, alignItems  : 'center', justifyContent : 'center'}}>
-            <Image source={require('../assets/images/logImage.png')} style={{width : 130, height : undefined, aspectRatio  : 292/191}}/>
+        <View style={{height  : 160, alignItems  : 'center', justifyContent : 'center'}}>
+            <Image source={require('../assets/images/logImage.png')} style={{width : 100, height : undefined, aspectRatio  : 292/191}}/>
         </View>
-        <View style={{flex : 1, borderRadius : 40, backgroundColor : '#202020', borderBottomLeftRadius : 0, borderBottomRightRadius : 0, paddingHorizontal : 16, paddingVertical : 50}}>
+        <View style={{flex : 1, borderRadius : 40, backgroundColor : '#202020', borderBottomLeftRadius : 0, borderBottomRightRadius : 0, paddingHorizontal : 16, paddingVertical : 40}}>
             <Text style={{color : 'white', textAlign : 'center', fontSize : 20, lineHeight : 22, fontWeight : '700'}}>Welcome Back</Text>
             {otpText && <Text style={{color : 'white', textAlign : 'center', fontSize : 20, lineHeight : 22, fontWeight : '700'}}>{otpText}</Text>}
             <Text style={{color : 'white', textAlign : 'center', fontSize : 14, lineHeight : 22, fontWeight : '400', marginTop : 7}}>Enter your details below</Text>
             <TextInput 
             value={moNum}
             maxLength={10}
+            editable={!isotpSent}
             onChangeText={(val)=>{
                 setMoNum(val)
             }}

@@ -112,6 +112,8 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
       {testArr?.map((test,testIndex)=>{
         return(
           <View key={testIndex} style={{borderBottomWidth : .5, borderColor : '#383838', marginBottom : 5}}>
+        <Text style={[styles.staMonthText,{color : 'white', fontSize : 16,fontWeight : '500'}]}>{test?.test_name}</Text>
+
               <View
         style={{
           flexDirection: 'row',
@@ -119,7 +121,7 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
           justifyContent: 'space-between',
         }}
       >
-        <Text style={styles.staMonthText}>{test?.created_date}</Text>
+        <Text style={styles.staMonthText}>{test?.created_date} </Text>
         <TouchableOpacity onPress={()=>{
           nav.navigate('PsyReport', {
             id: test.id})

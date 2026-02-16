@@ -134,7 +134,10 @@ export default function PsyReport({route}) {
       <ScrollView style={{paddingTop : safeAreaHeight}}>
 
         <View style={{paddingHorizontal : 16}}>
-          <Text style={{fontSize : 12, fontWeight : '400',marginTop : 16, color : '#A8A8A8'}}>
+          <Text style={{fontSize : 20, fontWeight : '500',marginTop : 16, color : '#fff'}}>
+          {reportObj?.test_name}
+          </Text>
+          <Text style={{fontSize : 12, fontWeight : '400',marginTop : 6, color : '#A8A8A8'}}>
           {reportObj?.test_given_date}
           </Text>
 
