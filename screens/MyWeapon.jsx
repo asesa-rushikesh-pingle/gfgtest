@@ -41,6 +41,7 @@ export default function MyWeapon() {
       
     
   const [weapnCats, setWeapnCats] = useState([])
+  const [issuedProducts, setIssuedProducts] = useState([])
   const [weaponList, setWeaponList] = useState([])
   const [rentedList, setRentedList] = useState([])
  
@@ -63,6 +64,14 @@ export default function MyWeapon() {
       useEffect(() => {
           const controller = new AbortController();
           getWeaponsList(controller)
+          return ()=>{
+            controller.abort();
+          }
+        }, [])
+
+        useEffect(() => {
+          const controller = new AbortController();
+          getIssuedProducts(controller)
           return ()=>{
             controller.abort();
           }
@@ -103,6 +112,15 @@ export default function MyWeapon() {
                 label :it.weapon_name , value : it.id
               }
             }))
+   
+          }
+        }
+        async function getIssuedProducts(controller) {
+          const branch = await AsyncStorage.getItem('branch_slug')
+          const respo = await getData(branch,'/athlete/get-issuing-products',{},controller)
+          if(respo.status){
+            console.log('issued products listt',respo)
+            setIssuedProducts(respo.data.list.data)
    
           }
         }
@@ -178,7 +196,7 @@ export default function MyWeapon() {
           }}
         >
           <TouchableOpacity
-            style={{ width: (Dimensions.get('window').width - 32) / 2 }}
+            style={{ width: (Dimensions.get('window').width - 32) / 3 }}
             onPress={() => {
               setActiveTab('own');
             }}
@@ -200,7 +218,7 @@ export default function MyWeapon() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ width: (Dimensions.get('window').width - 32) / 2 }}
+            style={{ width: (Dimensions.get('window').width - 32) / 3 }}
             onPress={() => {
               setActiveTab('rent');
             }}
@@ -220,6 +238,29 @@ export default function MyWeapon() {
               }}
             >
               Rent a gun
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ width: (Dimensions.get('window').width - 32) / 3 }}
+            onPress={() => {
+              setActiveTab('issue');
+            }} 
+          >
+            <Text
+              style={{
+                backgroundColor:
+                  activeTab == 'issue' ? '#636366' : 'transparent',
+                textAlign: 'center',
+                paddingVertical: 6,
+                paddingHorizontal: 8,
+                borderRadius: 7,
+                color: 'white',
+                fontSize: 13,
+                lineHeight: 20,
+                fontWeight: '400',
+              }}
+            >
+              Issued products
             </Text>
           </TouchableOpacity>
         </View>
@@ -341,7 +382,86 @@ export default function MyWeapon() {
      
 
         </View>
-        : 
+        : (activeTab == 'issue') ?
+        <View style={{padding : 16, flex : 1}}>
+          <ScrollView>
+            {issuedProducts?.length == 0 && 
+            <Text style={{color : 'white', textAlign : 'center', marginTop : 50, fontWeight : '600', fontSize : 16}}>No products found</Text>
+            }
+
+            {issuedProducts?.map((pro,proIndex)=>{
+              return(
+                <View key={proIndex} style={{
+                  backgroundColor: '#202020',
+                  borderRadius: 10,
+                  padding: 16,
+                  marginBottom: 16,
+                  flexDirection: 'column',
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.84,
+                  elevation: 5
+                }}>
+                  <View style={{flexDirection: 'row', marginBottom: 8}}>
+                    <View style={{flex: 1}}>
+                      <Text style={{color: '#A8A8A8', fontSize: 12, fontWeight: '400'}}>Item Name</Text>
+                      <Text style={{color: '#fff', fontWeight: '600', fontSize: 16}}>{pro?.weapon_name}</Text>
+                    </View>
+                    <View style={{flex: 1}}>
+                      <Text style={{color: '#A8A8A8', fontSize: 12, fontWeight: '400'}}>Item Type</Text>
+                      <Text style={{color: '#fff', fontWeight: '600', fontSize: 16}}>{pro?.product_type}</Text>
+                    </View>
+                  </View>
+                  <View style={{flexDirection: 'row', marginBottom: 8}}>
+                    <View style={{flex: 1}}>
+                      <Text style={{color: '#A8A8A8', fontSize: 12, fontWeight: '400'}}>Issued Date</Text>
+                      <Text style={{color: '#fff', fontWeight: '600', fontSize: 16}}>{pro?.issue_date}</Text>
+                    </View>
+                    <View style={{flex: 1}}>
+                      <Text style={{color: '#A8A8A8', fontSize: 12, fontWeight: '400'}}>Issued Quantity</Text>
+                      <Text style={{color: '#fff', fontWeight: '600', fontSize: 16}}>{pro?.issued_quantity}</Text>
+                    </View>
+                  </View>
+                  <View style={{flexDirection: 'row', marginBottom: 8}}>
+                    <View style={{flex: 1}}>
+                      <Text style={{color: '#A8A8A8', fontSize: 12, fontWeight: '400'}}>Expected Return Quantity</Text>
+                      <Text style={{color: '#fff', fontWeight: '600', fontSize: 16}}>{pro?.issued_quantity}</Text>
+                    </View>
+                    <View style={{flex: 1}}>
+                      <Text style={{color: '#A8A8A8', fontSize: 12, fontWeight: '400'}}>Returned Date</Text>
+                      <Text style={{color: '#fff', fontWeight: '600', fontSize: 16}}>{pro?.return_date}</Text>
+                    </View>
+                  </View>
+                  <View style={{flexDirection: 'row', marginBottom: 0}}>
+                    <View style={{flex: 1}}>
+                      <Text style={{color: '#A8A8A8', fontSize: 12, fontWeight: '400'}}>Returned Quantity</Text>
+                      <Text style={{color: '#fff', fontWeight: '600', fontSize: 16}}>{pro?.returned_quantity}</Text>
+                    </View>
+                    <View style={{flex: 1, alignItems: 'flex-end'}}>
+                      <Text style={{
+                        backgroundColor: '#DEF2DC',
+                        color: '#259607',
+                        fontSize: 12,
+                        paddingHorizontal: 12,
+                        paddingVertical: 4,
+                        borderRadius: 6,
+                        fontWeight: '700',
+                        overflow: 'hidden',
+                      }}>
+                       {pro?.return_status}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              )
+            })}
+         
+
+
+          </ScrollView>
+        </View>
+        :
         <View style={{padding : 16}}>
        {rentedList?.length == 0 && <Text style={{color : 'white',marginTop : 80, fontSize : 16,textAlign : 'center', fontWeight : '600',lineHeight : 22 }}>Rented weapon not found </Text> 
         }
