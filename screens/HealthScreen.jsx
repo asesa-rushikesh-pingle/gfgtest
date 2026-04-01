@@ -118,7 +118,72 @@ export default function HealthScreen() {
                 <TextInputComp placeholder={'Weight'} style={{marginHorizotal : 16}} state={Weight} setState={setWeight}/>
                 <TextInputComp placeholder={'Suit'} style={{marginHorizotal : 16}} state={suit} setState={setSuit}/>
                 <TextInputComp placeholder={'Shoe Size'} style={{marginHorizotal : 16}} state={shueSize} setState={setShueSize}/>
-                <TextInputComp placeholder={'T - Shirt Size'} style={{marginHorizotal : 16}} state={tshirtSize} setState={setTshirtSize}/>
+                <RNPickerSelect
+                  onValueChange={(value) => setTshirtSize(value)}
+                  useNativeAndroidPickerStyle={false}
+                  items={[
+                    {
+                      label : 'XS',
+                      value : 'XS'
+                    },
+                    {
+                      label : 'S',
+                      value : 'S'
+                    },
+                    {
+                      label : 'M',
+                      value : 'M'
+                    }
+                    ,
+                    {
+                      label : 'XL',
+                      value : 'XL'
+                    },
+                    {
+                      label : 'XXL',
+                      value : 'XXL'
+                    },
+                    {
+                      label : 'XXXL',
+                      value : 'XXXL'
+                    }
+                  ]}
+                >
+                      <View style={{paddingHorizontal : 0,marginTop : 16 }}>
+                        <View style={{paddingVertical : 12, paddingHorizontal : 16, borderRadius : 16, backgroundColor : '#202020', flexDirection : 'row', alignItems : 'center',justifyContent : 'space-between'}}>
+                            <Text style={{color : 'white', fontWeight : '500', fontSize : 16}}>{[
+                         {
+                          label : 'XS',
+                          value : 'XS'
+                        },
+                        {
+                          label : 'S',
+                          value : 'S'
+                        },
+                        {
+                          label : 'M',
+                          value : 'M'
+                        }
+                        ,
+                        {
+                          label : 'XL',
+                          value : 'XL'
+                        },
+                        {
+                          label : 'XXL',
+                          value : 'XXL'
+                        },
+                        {
+                          label : 'XXXL',
+                          value : 'XXXL'
+                        }
+                      ]?.find((it)=> it.value == tshirtSize)?.label || 'Choose Shirt Size'}</Text>
+                            <Image style={{width : 24, height : undefined , aspectRatio : 1}} source={require('../assets/images/donArrr.png')}/>
+                        </View> 
+                        </View>
+                </RNPickerSelect>
+
+                {/* <TextInputComp placeholder={'T - Shirt Size'} style={{marginHorizotal : 16}} state={tshirtSize} setState={setTshirtSize}/> */}
                 </View>
                 {/* <RNPickerSelect
                   onValueChange={(value) => setMaritalStatus(value)}

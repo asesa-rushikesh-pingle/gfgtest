@@ -290,6 +290,7 @@ export default function GeneralPracticeComp({selectedDate,athleteCourseId,athlet
          textAlignVertical="top" 
         style={{marginTop : 16, marginHorizontal : 16,paddingVertical : 12, paddingHorizontal : 20, borderRadius : 16, backgroundColor : '#202020',minHeight : 200,color : 'white'}}
         placeholder="Type here..."
+        placeholderTextColor={'white'}
         value={message} // <-- bind value
         onChangeText={text => setMessage(text)} // <-- update state
       />
