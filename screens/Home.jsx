@@ -71,10 +71,14 @@ export default function Home({route}) {
     const respo = await getData(branch,'/athlete/course',{},controller)
     if(respo.status){
       console.log("respo.data.course",respo.data)
-      await AsyncStorage.setItem('athleteCourseIdForGeneralCheckin',String(respo.data.course.id))
-      await AsyncStorage.setItem('athleteCourseIdForGeneralCheckincourse_id',String(respo.data.course.course_id))
+      await AsyncStorage.setItem('athleteCourseIdForGeneralCheckin',String(respo.data.course?.id) || '')
+      await AsyncStorage.setItem('athleteCourseIdForGeneralCheckincourse_id',String(respo.data.course?.course_id) || '')
       setCourseObj(respo.data.course) 
-      setOnGoingProgram(respo.data.course.onGoingProgram.todayAthleteCoursePrograms)
+     
+      if(respo.data.course){
+        setOnGoingProgram(respo.data.course.onGoingProgram.todayAthleteCoursePrograms)
+      }
+      
       // athleteCourseIdForGeneralCheckin
       console.log("course details ",respo.data.course)
     }
@@ -96,6 +100,14 @@ export default function Home({route}) {
    <Image source={require('../assets/images/hold.png')} style={{width : '100%', height : undefined, aspectRatio : 358/246}} />
    <Text style={{textAlign : 'center', marginTop : 26, color : '#A8A8A8', fontSize : 20, fontWeight : '700'}}>Waiting for Approval</Text>
    <Text style={{textAlign : 'center', marginTop : 26, color : '#656565', fontSize : 16, fontWeight : '600'}}>Your registration is under review.</Text>
+ </View>
+ </ScrollView> :
+ !courseObj ? 
+ <ScrollView style={{ paddingTop: safeAreaHeight , height : 1400}}>
+ <View style={{padding : 16}}>
+   <Image source={require('../assets/images/hold.png')} style={{width : '100%', height : undefined, aspectRatio : 358/246}} />
+   <Text style={{textAlign : 'center', marginTop : 26, color : '#A8A8A8', fontSize : 20, fontWeight : '700'}}>No Courses Available</Text>
+   <Text style={{textAlign : 'center', marginTop : 26, color : '#656565', fontSize : 16, fontWeight : '600'}}>You haven’t enrolled in any courses yet.</Text>
  </View>
  </ScrollView>
      : 
