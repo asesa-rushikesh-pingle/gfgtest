@@ -8,6 +8,8 @@ import {baseUrl} from '../constants/variables'
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import messaging from '@react-native-firebase/messaging';
+
 // import Tts from 'react-native-tts';
 
 
@@ -72,13 +74,19 @@ export default function LoginScreen() {
     }, [otpTime])
 
     async function veryOtpfn(txt) {
+
+        const fctoken = await messaging().getToken();
+        console.log("FCM TOKEN:", fctoken);
+
+        
      
 
         try {
 
             let payload ={
                 "mobile_no": moNum,
-                "otp": txt
+                "otp": txt,
+                "android_fcm_token" : fctoken
             }
 
             const res = await fetch(`${baseUrl}/auth/verify-otp`,{

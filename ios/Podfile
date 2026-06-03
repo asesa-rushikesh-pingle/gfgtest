@@ -16,6 +16,9 @@ end
 
 target 'GFGapp' do
   config = use_native_modules!
+  use_modular_headers! 
+  use_frameworks! :linkage => :static
+  $RNFirebaseAsStaticFramework = true
 
   use_react_native!(
     :path => config[:reactNativePath],

@@ -27,6 +27,12 @@ import TitleBar from './screens/components/TitleBar'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createStackNavigator } from '@react-navigation/stack';
 
+import {PermissionsAndroid} from 'react-native';
+import messaging from '@react-native-firebase/messaging';
+
+import notifee from '@notifee/react-native';
+
+
 
 
 // const Stack = createNativeStackNavigator();
@@ -41,6 +47,72 @@ export default function App() {
   const [safeAreaHeight, setSafeAreaHeight] = useState(0)
 
   const [initialRoute, setInitialRoute] = useState(null); // null means loading
+
+
+  useEffect(() => {
+    // Check if permission is already granted before requesting
+    requestAndroidPermissionsFn();
+
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      
+      // Alert.alert(remoteMessage.notification?.title || 'New Message', remoteMessage.notification?.body || '');
+      selfFn(remoteMessage.notification?.title || 'New Message', remoteMessage.notification?.body || 'Main body content of the notification')
+      
+    });
+
+    return unsubscribe;
+  }, []);
+
+  async function requestAndroidPermissionsFn() {
+
+
+    let granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+    while (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+      const shouldAskAgain = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+      );
+      if (shouldAskAgain === PermissionsAndroid.RESULTS.GRANTED) {
+        granted = shouldAskAgain;
+        break;
+      } else {
+        // Optionally, you can show an alert or log a message here
+        // For user experience, maybe break if user chooses "Never ask again"
+        if (shouldAskAgain === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+          console.log('User chose never to be asked again for notification permission.');
+          break;
+        }
+      } 
+    }
+  } 
+
+  async function selfFn(tit,body) {
+    // Request permissions (required for iOS)
+    await notifee.requestPermission()
+
+    // Create a channel (required for Android)
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+    });
+
+    // Display a notification
+    await notifee.displayNotification({
+      title: tit,
+      body: body,
+      android: {
+        channelId,
+        // optional, defaults to 'ic_launcher'.
+        // pressAction is needed if you want the notification to open the app when pressed
+        pressAction: {
+          id: 'default',
+        },
+      },
+    });
+  }
 
 
   useEffect(() => {
