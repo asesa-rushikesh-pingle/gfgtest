@@ -217,7 +217,7 @@ export default function HistoryDetails({ route }) {
             </View>
           </View>
           {/* green box  */}
-          {/* <View
+          <View
        
             style={{
               marginTop: 16,
@@ -293,26 +293,28 @@ export default function HistoryDetails({ route }) {
                   color: '#fff',
                   fontSize: 16,
                   fontWeight: '500',
-                  marginBottom: 10,
+                
                 }}
               >
-               {program?.course_category_name}
+               {/* {program?.course_category_name} */}
+               {program?.program_name}
               </Text>
-              <Text
+              {program?.course_category_name && <Text
                 style={{
                   color: '#A8A8A8',
                   fontSize: 14,
                   fontWeight: '400',
                   marginBottom: 0,
+                  marginTop: 10,
                 }}
               >
-                {program?.program_name}
-              </Text>
+                {program?.course_category_name}
+              </Text> }
             </View>
               )
             })}
 
-          </View> */}
+          </View>
         
 
           {/* diary comment by coach  */}

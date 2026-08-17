@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import TitleBar from './components/TitleBar';
 import Footer from './components/Footer';
 import DiaryTabs from './components/DiaryTabs';
+import FullScreenLoader from './components/FullScreenLoader';
 import styles from './Style';
 import { BlurView } from '@react-native-community/blur';
 import CalendarStrip from 'react-native-calendar-strip';
@@ -33,6 +34,8 @@ export default function CourseDetail() {
 
        const [ongoingProgramList, setOngoingProgramList] = useState([])
        const [nestedAccourdianPrograms, setNestedAccourdianPrograms] = useState([])
+
+       const [isLoading, setIsLoading] = useState(false)
      
 
      const today = moment();
@@ -42,6 +45,9 @@ export default function CourseDetail() {
      const [courseObj, setCourseObj] = useState('')
 
      const [programToggler, setProgramToggler] = useState(false)
+
+     const [weekDetails, setWeekDetails] = useState([])
+     const [customPrograms, setCustomPrograms] = useState([])
    
      const handleDateSelected = (date) => {
       if(date.isSame(moment(), 'day')){
@@ -141,6 +147,30 @@ export default function CourseDetail() {
       }
     }
 
+    // complete program api 
+    async function completeProgramFn(program_id,type) {
+      setIsLoading(true)
+      const branch = await AsyncStorage.getItem('branch_slug')
+      const respo = await postJSONData(branch,'/athlete/mark-complete-program',{
+        "athlete_course_id": athleteCourseId,
+        "program_id" : program_id,
+        "type" : type
+      })
+    
+      if(respo.status){
+        setProgramToggler(s=>!s)
+        // Alert.alert('Cheked Out','You are cheked out sucessfully!')
+        // nav.navigate('HistoryDetails', {
+        //   dateString: selectedDate.format("YYYY-MM-DD")})
+        // setProgramToggler(s=>!s)
+
+        setIsLoading(false)
+
+      }else{
+        setIsLoading(false)
+      }
+    }
+
     async function saveChoosenPrograms() {
       let temprograms = [
     ]
@@ -199,7 +229,11 @@ export default function CourseDetail() {
         setAthleteCourseId(respo.data.course.id)
        
         setOnGoingProgram(respo.data.course.onGoingProgram.todayAthleteCoursePrograms)
-        console.log("respo.data.course.onGoingProgram",respo.data.course.onGoingProgram)
+        setWeekDetails(respo.data.course.weekDetails)
+        setCustomPrograms(respo.data.course.custom_programs)
+        console.log('weekdetails ', respo.data.course.weekDetails)
+        console.log('custom_programs ', respo.data.course.custom_programs) 
+        console.log("respo.data.course",respo.data.course)
       }
     }
     async function getChooseProgramListFn(controller) {
@@ -245,6 +279,64 @@ export default function CourseDetail() {
 
       })
       setNestedAccourdianPrograms(updatedpro)
+    }
+
+    function groupWeekDetails(rawDetails) {
+      if (!rawDetails) return []
+      const list = Array.isArray(rawDetails) ? rawDetails : Object.values(rawDetails)
+      if (!list.length) return []
+
+      if (list.some((item) => Array.isArray(item?.weeks))) {
+        return list.map((item) => ({
+          category_name: item.category_name || item.course_category_name,
+          weeks: (item.weeks || []).map((week) => ({
+            week_number: week.week_number ?? week.week,
+            days: week.days || week.programs || [],
+          })),
+        }))
+      }
+
+      const categoryMap = {}
+
+      const pushDay = (categoryName, weekNumber, dayObj) => {
+        const cat = categoryName || 'Programs'
+        const weekNum = weekNumber ?? 1
+        if (!categoryMap[cat]) categoryMap[cat] = {}
+        if (!categoryMap[cat][weekNum]) categoryMap[cat][weekNum] = []
+        categoryMap[cat][weekNum].push({
+          ...dayObj,
+          day: dayObj.day ?? dayObj.day_number ?? dayObj.day_no,
+          program_name: dayObj.program_name,
+        })
+      }
+
+      list.forEach((item) => {
+        const itemCat = item.category_name || item.course_category_name
+        const itemWeek = item.week_number ?? item.week ?? item.week_no
+
+        if (Array.isArray(item.days)) {
+          item.days.forEach((dayItem) => {
+            pushDay(
+              dayItem.category_name || dayItem.course_category_name || itemCat,
+              itemWeek ?? dayItem.week_number ?? dayItem.week,
+              dayItem
+            )
+          })
+          return
+        }
+
+        pushDay(itemCat, itemWeek, item)
+      })
+
+      return Object.keys(categoryMap).map((category_name) => ({
+        category_name,
+        weeks: Object.keys(categoryMap[category_name])
+          .sort((a, b) => Number(a) - Number(b))
+          .map((week_number) => ({
+            week_number: isNaN(Number(week_number)) ? week_number : Number(week_number),
+            days: categoryMap[category_name][week_number],
+          })),
+      }))
     }
 
   return (
@@ -551,7 +643,7 @@ export default function CourseDetail() {
                   <TouchableOpacity style={{position : 'absolute', top : '35%', right : 10}} onPress={()=>{
                     Alert.alert(
                       'Confirm Checkout',
-                      'Are you sure you want to complete the Program?',
+                      'Are you sure you want to Checkout?',
                       [
                         {
                           text: 'Cancel',
@@ -559,12 +651,8 @@ export default function CourseDetail() {
                           style: 'cancel', // gives iOS-style grey button
                         },
                         {
-                          text: 'No',
-                          onPress: () =>  logoutProgrmaFn(false),
-                        },
-                        {
                           text: 'Yes',
-                          onPress: () =>  logoutProgrmaFn(true),
+                          onPress: () =>  logoutProgrmaFn(false),
                         },
                       ],
                       { cancelable: true }
@@ -582,6 +670,104 @@ export default function CourseDetail() {
               </View>
             </View>
 
+            <View style={{paddingHorizontal : 16}}>
+              {groupWeekDetails(weekDetails)?.map((category, cIdx)=>{
+                return (
+                  <View key={cIdx} style={styles.mentalTraiView}>
+                    <Text style={styles.coHeadinggg}>{category?.category_name}</Text>
+
+                    {category?.weeks?.map((week, wIdx)=>{
+                      return (
+                        <View key={wIdx} style={{marginTop : 10}}>
+                          <Text style={styles.staMonthText}>Week {week?.week_number}</Text>
+
+                          {week?.days?.map((dayItem, dIdx)=>{
+                            const isCompleted = dayItem?.is_completed || dayItem?.completed
+                            return (
+                              <View key={dIdx} style={{padding : 10, marginTop : 10, backgroundColor : '#202020', borderRadius : 10, flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between'}}>
+                                <Text style={[styles.codescr, {flex : 1, marginRight : 8}]}>Day {dayItem?.day} - {dayItem?.program_name}</Text>
+                                {isCompleted ?
+                                  <Text style={styles.ongoingtext}>Completed</Text>
+                                :
+                                  <TouchableOpacity onPress={()=>{
+                                    // setProgrmaFn(dayItem)
+                                    Alert.alert(
+                                      'Complete Program ?',
+                                      'Are you sure you want to complete the Program?',
+                                      [
+                                        {
+                                          text: 'Cancel',
+                                          onPress: () => console.log('Cancel Pressed'),
+                                          style: 'cancel', // gives iOS-style grey button
+                                        },
+                                        {
+                                          text: 'Yes',
+                                          onPress: () =>   completeProgramFn(dayItem?.id,'course'),
+                                        },
+                                      ],
+                                      { cancelable: true }
+                                    );
+
+
+                                   
+                                  }} style={{paddingVertical : 4, paddingHorizontal : 8, backgroundColor : '#EB6925', borderRadius : 6}}>
+                                    <Text style={{color : 'black', fontSize : 12, fontWeight : '600'}}>Complete</Text>
+                                  </TouchableOpacity>
+                                }
+                              </View>
+                            )
+                          })}
+                        </View>
+                      )
+                    })}
+                  </View>
+                )
+              })}
+
+              {customPrograms?.length > 0 &&
+                <View style={styles.mentalTraiView}>
+                  <Text style={styles.coHeadinggg}>Custom Programs</Text>
+                  {customPrograms?.map((program, pIdx)=>{
+                    const isCompleted = program?.is_completed || program?.completed
+                    return (
+                      <View key={pIdx} style={{padding : 10, marginTop : 10, backgroundColor : '#202020', borderRadius : 10, flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between'}}>
+                        <Text style={[styles.codescr, {flex : 1, marginRight : 8}]}>{program?.program_name}</Text>
+                        {isCompleted ?
+                          <Text style={styles.ongoingtext}>Completed</Text>
+                        :
+                          <TouchableOpacity onPress={()=>{
+                            // setProgrmaFn({...program, is_custom : 1})
+                            Alert.alert(
+                              'Complete Program ?',
+                              'Are you sure you want to complete the Program?',
+                              [
+                                {
+                                  text: 'Cancel',
+                                  onPress: () => console.log('Cancel Pressed'),
+                                  style: 'cancel', // gives iOS-style grey button
+                                },
+                                {
+                                  text: 'Yes',
+                                  onPress: () =>   completeProgramFn(program?.custom_program_id,'custom'),
+                                },
+                              ],
+                              { cancelable: true }
+                            );
+
+
+                          }} style={{paddingVertical : 4, paddingHorizontal : 8, backgroundColor : '#EB6925', borderRadius : 6}}>
+                            <Text style={{color : 'black', fontSize : 12, fontWeight : '600'}}>Complete</Text>
+                          </TouchableOpacity>
+                        }
+                      </View>
+                    )
+                  })}
+                </View>
+              }
+            </View>
+
+            {/* custom full scree loader  */}
+            <FullScreenLoader visible={isLoading} />
 
             {/* DiaryTabs  */}
             {athleteCompletedCourseId &&
