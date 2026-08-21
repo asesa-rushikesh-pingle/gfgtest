@@ -310,6 +310,18 @@ export default function HistoryDetails({ route }) {
               >
                 {program?.course_category_name}
               </Text> }
+              {program?.completedDateTime ? (
+                <Text
+                  style={{
+                    color: '#656565',
+                    fontSize: 12,
+                    fontWeight: '400',
+                    marginTop: 8,
+                  }}
+                >
+                  Completed on {program.completedDateTime}
+                </Text>
+              ) : null}
             </View>
               )
             })}

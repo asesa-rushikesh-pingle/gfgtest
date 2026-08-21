@@ -242,8 +242,15 @@ export default function History() {
           {historyList?.map((itemm,indexx)=>{
             return(
 
+              <TouchableOpacity  key={indexx} onPress={()=>{
+                if(itemm.status == 'Absent'){
+                  return
+                }
+                nav.navigate('HistoryDetails', {
+                      dateString: itemm?.fullDate})
+                }}>
             <View
-            key={indexx}
+           
             style={{
               padding: 10,
               backgroundColor: '#202020',
@@ -264,6 +271,8 @@ export default function History() {
                   justifyContent: 'flex-start',
                   flexDirection: 'row',
                   columnGap: 10,
+             
+                  width : '75%'
                 }}
               >
                 <View
@@ -293,7 +302,7 @@ export default function History() {
                   </Text>
                 </View>
                 <Text
-                  style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}
+                  style={{ color: '#fff', flexShrink : 1, width : '75%', fontSize: 18, fontWeight: '600' }}
                 >
                   {itemm?.course_name}
                 </Text>
@@ -366,6 +375,7 @@ export default function History() {
             })} */}
            
           </View>
+          </TouchableOpacity>
           )
         })}
         </View>

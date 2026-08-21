@@ -47,6 +47,7 @@ export default function CourseDetail() {
      const [programToggler, setProgramToggler] = useState(false)
 
      const [weekDetails, setWeekDetails] = useState([])
+     const [expandedWeeks, setExpandedWeeks] = useState({})
      const [customPrograms, setCustomPrograms] = useState([])
    
      const handleDateSelected = (date) => {
@@ -77,6 +78,20 @@ export default function CourseDetail() {
         controller.abort();
       }
     }, [programToggler])
+
+    useEffect(() => {
+      const groupedWeeks = groupWeekDetails(weekDetails)
+      const initialExpandedWeeks = {}
+
+      groupedWeeks.forEach((category, cIdx) => {
+        category?.weeks?.forEach((week, wIdx) => {
+          const weekKey = `${cIdx}-${wIdx}`
+          initialExpandedWeeks[weekKey] = wIdx === 0
+        })
+      })
+
+      setExpandedWeeks(initialExpandedWeeks)
+    }, [weekDetails])
 
      useEffect(() => {
       const controller = new AbortController();
@@ -121,7 +136,7 @@ export default function CourseDetail() {
         // await AsyncStorage.setItem('athlete_completed_course_program_id',respo.data.details.athlete_completed_course_program_id ? String(respo.data.details.athlete_completed_course_program_id) : '')
         setAthleteCompletedCourseId(respo.data.details[0].athlete_completed_course_program_id)
         // Alert.alert(String(respo.data.details.athlete_completed_course_program_id))
-        setProgramList(list)
+        // setProgramList(list)
         console.log("dropdown progrma list ",list)
 
 
@@ -157,7 +172,7 @@ export default function CourseDetail() {
         "type" : type
       })
     
-      if(respo.status){
+      if(respo?.status){
         setProgramToggler(s=>!s)
         // Alert.alert('Cheked Out','You are cheked out sucessfully!')
         // nav.navigate('HistoryDetails', {
@@ -167,8 +182,10 @@ export default function CourseDetail() {
         setIsLoading(false)
 
       }else{
+        setProgramToggler(s=>!s)
         setIsLoading(false)
       }
+      // setIsLoading(false)
     }
 
     async function saveChoosenPrograms() {
@@ -664,7 +681,7 @@ export default function CourseDetail() {
           
                             </TouchableOpacity>
                   }
-                  
+                   
                 </View>
 
               </View>
@@ -677,20 +694,39 @@ export default function CourseDetail() {
                     <Text style={styles.coHeadinggg}>{category?.category_name}</Text>
 
                     {category?.weeks?.map((week, wIdx)=>{
+                      const weekKey = `${cIdx}-${wIdx}`
+                      const isWeekExpanded = !!expandedWeeks[weekKey]
                       return (
                         <View key={wIdx} style={{marginTop : 10}}>
-                          <Text style={styles.staMonthText}>Week {week?.week_number}</Text>
+                          <TouchableOpacity
+                            onPress={() => {
+                              setExpandedWeeks((prev) => ({
+                                ...prev,
+                                [weekKey]: !prev[weekKey],
+                              }))
+                            }}
+                            style={{flexDirection : 'row', alignItems : 'center', columnGap : 8}}
+                          >
+                            <Text style={{color : 'white', fontSize : 16, fontWeight : '600'}}>
+                              {isWeekExpanded ? '▼' : '▶'}
+                            </Text>
+                            <Text style={{color : 'white', fontSize : 16, fontWeight : '600'}}>Week {week?.week_number}</Text>
+                          </TouchableOpacity>
 
-                          {week?.days?.map((dayItem, dIdx)=>{
+                          {isWeekExpanded && week?.days?.map((dayItem, dIdx)=>{
                             const isCompleted = dayItem?.is_completed || dayItem?.completed
+                            const canComplete = !!dayItem?.canComplete
                             return (
                               <View key={dIdx} style={{padding : 10, marginTop : 10, backgroundColor : '#202020', borderRadius : 10, flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between'}}>
-                                <Text style={[styles.codescr, {flex : 1, marginRight : 8}]}>Day {dayItem?.day} - {dayItem?.program_name}</Text>
+                                <Text style={[styles.codescr, {flex : 1, marginRight : 8}]}>Day {dayItem?.day} , {dayItem?.program_name}</Text>
                                 {isCompleted ?
                                   <Text style={styles.ongoingtext}>Completed</Text>
                                 :
-                                  <TouchableOpacity onPress={()=>{
+                                  <TouchableOpacity
+                                    disabled={!canComplete}
+                                    onPress={()=>{
                                     // setProgrmaFn(dayItem)
+                                    if(!canComplete) return
                                     Alert.alert(
                                       'Complete Program ?',
                                       'Are you sure you want to complete the Program?',
@@ -710,8 +746,8 @@ export default function CourseDetail() {
 
 
                                    
-                                  }} style={{paddingVertical : 4, paddingHorizontal : 8, backgroundColor : '#EB6925', borderRadius : 6}}>
-                                    <Text style={{color : 'black', fontSize : 12, fontWeight : '600'}}>Complete</Text>
+                                  }} style={{paddingVertical : 4, paddingHorizontal : 8, backgroundColor : canComplete ? '#EB6925' : '#555555', borderRadius : 6, opacity : canComplete ? 1 : 0.6}}>
+                                    <Text style={{color : canComplete ? 'black' : '#AAAAAA', fontSize : 12, fontWeight : '600'}}>Mark as Complete</Text>
                                   </TouchableOpacity>
                                 }
                               </View>
@@ -729,14 +765,18 @@ export default function CourseDetail() {
                   <Text style={styles.coHeadinggg}>Custom Programs</Text>
                   {customPrograms?.map((program, pIdx)=>{
                     const isCompleted = program?.is_completed || program?.completed
+                    const canComplete = !!program?.canComplete
                     return (
                       <View key={pIdx} style={{padding : 10, marginTop : 10, backgroundColor : '#202020', borderRadius : 10, flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between'}}>
                         <Text style={[styles.codescr, {flex : 1, marginRight : 8}]}>{program?.program_name}</Text>
                         {isCompleted ?
                           <Text style={styles.ongoingtext}>Completed</Text>
                         :
-                          <TouchableOpacity onPress={()=>{
+                          <TouchableOpacity
+                            disabled={!canComplete}
+                            onPress={()=>{
                             // setProgrmaFn({...program, is_custom : 1})
+                            if(!canComplete) return
                             Alert.alert(
                               'Complete Program ?',
                               'Are you sure you want to complete the Program?',
@@ -755,8 +795,8 @@ export default function CourseDetail() {
                             );
 
 
-                          }} style={{paddingVertical : 4, paddingHorizontal : 8, backgroundColor : '#EB6925', borderRadius : 6}}>
-                            <Text style={{color : 'black', fontSize : 12, fontWeight : '600'}}>Complete</Text>
+                          }} style={{paddingVertical : 4, paddingHorizontal : 8, backgroundColor : canComplete ? '#EB6925' : '#555555', borderRadius : 6, opacity : canComplete ? 1 : 0.6}}>
+                            <Text style={{color : canComplete ? 'black' : '#AAAAAA', fontSize : 12, fontWeight : '600'}}>Mark as Complete</Text>
                           </TouchableOpacity>
                         }
                       </View>
