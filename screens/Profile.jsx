@@ -157,6 +157,29 @@ export default function Profile() {
             />
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={stylesNew.billingSection}
+            onPress={() => nav.navigate('Queries')}
+          >
+            <View style={stylesNew.billingConatiner}>
+              <Image
+                source={require('../assets/icons/policy.png')}
+                style={{ height: 24, width: 24 }}
+              />
+              <View>
+                <Text style={stylesNew.billingpayment}>Queries</Text>
+                <Text style={stylesNew.pendingAmount}>
+                  Create or view queries
+                  {/* <Text style={stylesNew.amountPending}> {pedingAmount.toLocaleString('en-IN')}/-</Text> */}
+                </Text>
+              </View>
+            </View>
+            <Image
+              source={require('../assets/icons/expand.png')}
+              style={{ height: 24, width: 24 }}
+            />
+          </TouchableOpacity>
+
           <TouchableOpacity style={stylesNew.billingSection} onPress={()=>{
             nav.navigate('HealthScreen')
           }}>

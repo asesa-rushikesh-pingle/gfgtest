@@ -7,7 +7,7 @@ import { BlurView } from "@react-native-community/blur";
 import styles from '../Style'
 import { useNavigation } from '@react-navigation/native';
 
-export default function TitleBar({title,setSafeAreaHeight}) {
+export default function TitleBar({title,setSafeAreaHeight, onRightPress}) {
   const nav = useNavigation()
   const inset = useSafeAreaInsets()
   return (
@@ -31,7 +31,11 @@ export default function TitleBar({title,setSafeAreaHeight}) {
       <Image source={require('../../assets/images/backBtn.png')} style={{width : 24, aspectRatio : 1 , height : undefined}}  />
       </TouchableOpacity>
       <Text style={styles.pageBarTitle}>{title ? title : "Daily Training Details"}</Text>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={()=>{
+        if(onRightPress){
+          onRightPress()
+        }
+      }}>
       <Image source={require('../../assets/images/iico.png')} style={{width : 32, aspectRatio : 1 , height : undefined}}  />
       </TouchableOpacity>
 

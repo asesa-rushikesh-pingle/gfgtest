@@ -18,6 +18,8 @@ import ScanQr from "./screens/ScanQr"
 import MyWeapon from "./screens/MyWeapon"
 import History from "./screens/History"
 import HistoryDetails from "./screens/HistoryDetails"
+import Queries from "./screens/Queries"
+import QueryChat from "./screens/QueryChat"
 import { NavigationContainer } from '@react-navigation/native';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -219,6 +221,8 @@ export default function App() {
     <Stack.Screen name="MyWeapon" component={MyWeapon} />  
     <Stack.Screen name="History" component={History} />  
     <Stack.Screen name="HistoryDetails" component={HistoryDetails} />
+    <Stack.Screen name="Queries" component={Queries} />
+    <Stack.Screen name="QueryChat" component={QueryChat} />
     </Stack.Navigator>
     </NavigationContainer>
     </SafeAreaProvider>
