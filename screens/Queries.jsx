@@ -12,7 +12,7 @@ import {
   Platform,
   Keyboard,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import TitleBar from './components/TitleBar';
 import styles from './Style';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,42 +22,6 @@ import { pick, types } from '@react-native-documents/picker';
 import TextInputComp from './components/TextInputComp';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useNavigation } from '@react-navigation/native';
-
-const STATIC_QUERIES = [
-  {
-    id: 1,
-    subject: 'Range timing clarification',
-    query_text:
-      'Can you confirm the pistol range availability for Saturday morning practice session?',
-    coach_name: 'Rahul Sharma',
-    created_at: '24 Aug 2026',
-    file: null,
-  },
-  {
-    id: 2,
-    subject: 'Ammunition request',
-    query_text:
-      'I need additional .22 ammunition for this week’s training. Please let me know the process.',
-    coach_name: 'Anjali Mehta',
-    created_at: '22 Aug 2026',
-    file: {
-      name: 'ammunition-request.pdf',
-      type: 'application/pdf',
-    },
-  },
-  {
-    id: 3,
-    subject: 'Scorecard review',
-    query_text:
-      'Could you please review my last three scorecards and share feedback on trigger control?',
-    coach_name: 'Vikram Singh',
-    created_at: '18 Aug 2026',
-    file: {
-      name: 'scorecard.jpg',
-      type: 'image/jpeg',
-    },
-  },
-];
 
 function shortText(text = '', max = 90) {
   const t = String(text || '').trim();
@@ -70,42 +34,37 @@ function shortText(text = '', max = 90) {
   return `${t.slice(0, max).trim()}...`;
 }
 
-function mapCoach(coach, role, index) {
-  const id = coach?.user_id || coach?.id || coach?.coach_id;
-  const name =
-    coach?.coach_name ||
-    `${coach?.first_name || ''} ${coach?.last_name || ''}`.trim() ||
-    'User';
-  return {
-    label: role ? `${name} (${role})` : name,
-    value: id || `${role}-${index}`,
-    name,
-  };
+function mapQueryUsers(users = []) {
+  return (users || []).map(user => {
+    const name = user?.full_name || 'User';
+    const role = user?.role_name;
+    return {
+      label: role ? `${name} (${role})` : name,
+      value: user?.id,
+      name,
+    };
+  });
 }
 
-function mapUsersFromCourse(course) {
-  const heads = (course?.coaches?.head_coaches || []).map((coach, index) =>
-    mapCoach(coach, 'Head Coach', index),
-  );
-  const assistants = (course?.coaches?.assistant_coaches || []).map(
-    (coach, index) => mapCoach(coach, 'Assistant Coach', index),
-  );
-  const seen = new Set();
-
-  return [...heads, ...assistants].filter(user => {
-    const key = String(user.value);
-    if (seen.has(key)) {
-      return false;
-    }
-    seen.add(key);
-    return true;
-  });
+function mapQueryListItem(item) {
+  return {
+    id: item?.id,
+    subject: item?.subject || '',
+    query_text: item?.query || '',
+    coach_name: item?.users || '—',
+    created_at: item?.date || '',
+    file: item?.attachment
+      ? typeof item.attachment === 'string'
+        ? { uri: item.attachment, name: 'Attachment' }
+        : item.attachment
+      : null,
+  };
 }
 
 export default function Queries() {
   const [safeAreaHeight, setSafeAreaHeight] = useState(0);
   const [visible, setVisible] = useState(false);
-  const [queryList, setQueryList] = useState(STATIC_QUERIES);
+  const [queryList, setQueryList] = useState([]);
   const [userList, setUserList] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [subject, setSubject] = useState('');
@@ -114,21 +73,63 @@ export default function Queries() {
   const [isLoading, setIsLoading] = useState(false);
   const inset = useSafeAreaInsets();
   const nav = useNavigation();
+  const searchTimeoutRef = useRef(null);
+  const usersControllerRef = useRef(null);
+  const listControllerRef = useRef(null);
 
   useEffect(() => {
-    const controller = new AbortController();
-    getUsersFn(controller);
+    getQueryListFn();
     return () => {
-      controller.abort();
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+      usersControllerRef.current?.abort();
+      listControllerRef.current?.abort();
     };
   }, []);
 
-  async function getUsersFn(controller) {
+  async function getQueryListFn(page = 1, limit = 10) {
+    listControllerRef.current?.abort();
+    const controller = new AbortController();
+    listControllerRef.current = controller;
+
     const branch = await AsyncStorage.getItem('branch_slug');
-    const respo = await getData(branch, '/athlete/course', {}, controller);
+    const respo = await getData(
+      branch,
+      '/admin/communication/list',
+      { page, limit },
+      controller,
+    );
     if (respo?.status) {
-      setUserList(mapUsersFromCourse(respo.data.course));
+      const list = respo?.data?.queryList?.data || [];
+      setQueryList(list.map(mapQueryListItem));
     }
+  }
+
+  async function getUsersFn(searchText = '') {
+    usersControllerRef.current?.abort();
+    const controller = new AbortController();
+    usersControllerRef.current = controller;
+
+    const branch = await AsyncStorage.getItem('branch_slug');
+    const respo = await getData(
+      branch,
+      '/athlete/query-users',
+      { searchText },
+      controller,
+    );
+    if (respo?.status) {
+      setUserList(mapQueryUsers(respo?.data?.users));
+    }
+  }
+
+  function onUserSearch(text) {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      getUsersFn(text?.trim?.() || '');
+    }, 400);
   }
 
   const pickFile = async () => {
@@ -162,7 +163,9 @@ export default function Queries() {
 
   function openGenerateModal() {
     resetForm();
+    setUserList([]);
     setVisible(true);
+    getUsersFn('');
   }
 
   async function submitQueryFn() {
@@ -182,42 +185,29 @@ export default function Queries() {
     Keyboard.dismiss();
     const branch = await AsyncStorage.getItem('branch_slug');
     const formData = new FormData();
-    formData.append('user_id', selectedUserId);
     formData.append('subject', subject.trim());
-    formData.append('query_text', queryText.trim());
+    formData.append('description', queryText.trim());
+    formData.append('user_ids[0]', selectedUserId);
     if (selectedFile) {
-      formData.append('file', selectedFile);
+      formData.append('attachment', {
+        uri: selectedFile.uri,
+        name: selectedFile.name || 'attachment',
+        type: selectedFile.type || 'application/octet-stream',
+      });
     }
 
     const respo = await postFormData(
       branch,
-      '/athlete/query/add',
+      '/admin/communication/add',
       formData,
       setIsLoading,
     );
 
     if (respo?.status) {
-      const selectedUser = userList.find(user => user.value == selectedUserId);
-      setQueryList(prev => [
-        {
-          id: Date.now(),
-          subject: subject.trim(),
-          query_text: queryText.trim(),
-          coach_name: selectedUser?.name || selectedUser?.label || '—',
-          created_at: 'Just now',
-          file: selectedFile
-            ? {
-                uri: selectedFile.uri,
-                name: selectedFile.name,
-                type: selectedFile.type,
-              }
-            : null,
-        },
-        ...prev,
-      ]);
       setVisible(false);
       resetForm();
       Alert.alert('Query submitted successfully');
+      getQueryListFn();
     }
   }
 
@@ -348,6 +338,7 @@ export default function Queries() {
                 onChange={item => {
                   setSelectedUserId(item.value);
                 }}
+                onChangeText={onUserSearch}
                 style={stylesNew.dropdown}
                 placeholderStyle={stylesNew.dropdownPlaceholder}
                 selectedTextStyle={stylesNew.dropdownSelected}
