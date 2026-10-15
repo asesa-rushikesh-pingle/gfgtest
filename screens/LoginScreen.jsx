@@ -108,6 +108,8 @@ export default function LoginScreen() {
                     await AsyncStorage.setItem('profile_pic_url', data.data.profile_pic_url);
                 }
                 await AsyncStorage.setItem('first_name', data.data.first_name);
+                await AsyncStorage.setItem('lat', '16.6801');
+                await AsyncStorage.setItem('long', '74.2136');
                 await AsyncStorage.setItem('last_name', data.data.last_name || '');
                 await AsyncStorage.setItem('branch_name', data.data.branches[0].branch_name);
                 await AsyncStorage.setItem('branch_slug', data.data.branches[0].branch_slug);

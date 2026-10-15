@@ -15,6 +15,8 @@
 
 <key>NSCameraUsageDescription</key>
 <string>We need camera access to take photos</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>We need your location to get your current latitude and longitude.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
