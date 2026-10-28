@@ -180,6 +180,28 @@ export default function Profile() {
             />
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={stylesNew.billingSection}
+            onPress={() => nav.navigate('WeaponCarryingLetterList')}
+          >
+            <View style={stylesNew.billingConatiner}>
+              <Image
+                source={require('../assets/icons/rifle.png')}
+                style={{ height: 24, width: 24 }}
+              />
+              <View>
+                <Text style={stylesNew.billingpayment}>Weapon Carrying Letter</Text>
+                <Text style={stylesNew.pendingAmount}>
+                  View or Request weapon carrying letter
+                </Text>
+              </View>
+            </View>
+            <Image
+              source={require('../assets/icons/expand.png')}
+              style={{ height: 24, width: 24 }}
+            />
+          </TouchableOpacity>
+
           <TouchableOpacity style={stylesNew.billingSection} onPress={()=>{
             nav.navigate('HealthScreen')
           }}>
