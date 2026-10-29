@@ -158,8 +158,10 @@ export default function Footer({activeIndex = 1}) {
     <Image source={require('../../assets/images/qrico.png')} style={{ tintColor : theme.mode === 'light' ? theme.text : '#fff', width : 32, aspectRatio : 1 , height : undefined,objectFit : 'contain'}}  />
       </View>
     </TouchableOpacity>
-    <TouchableOpacity>
-    <Image source={require('../../assets/images/achicoo.png')} style={{ tintColor :  false ?  theme.accent : theme.iconInactive, width : 37, aspectRatio : 1 , height : undefined,objectFit : 'contain', borderBottomWidth : 2, borderBottomColor : false ?  theme.accent : 'transparent', paddingBottom : 2}}  />
+    <TouchableOpacity onPress={()=>{
+      nav.navigate('CompetitionList')
+    }}>
+    <Image source={require('../../assets/images/achicoo.png')} style={{ tintColor :  activeIndex == 4  ?  theme.accent : theme.iconInactive, width : 37, aspectRatio : 1 , height : undefined,objectFit : 'contain', borderBottomWidth : 2, borderBottomColor : false ?  theme.accent : 'transparent', paddingBottom : 2}}  />
     </TouchableOpacity>
     <TouchableOpacity onPress={()=>{
       nav.navigate('Settings')

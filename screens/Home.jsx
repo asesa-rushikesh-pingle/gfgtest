@@ -24,6 +24,8 @@ import {getData} from '../helper/callApi'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PsycologicalSkills from '../screens/components/PsycologicalSkills'
 import { useTheme } from '../context/ThemeContext';
+import moment from 'moment';
+import { competitions, getLevelColor } from '../constants/competitions';
 
 export default function Home({route}) {
   const [safeAreaHeight, setSafeAreaHeight] = useState(0);
@@ -34,7 +36,9 @@ export default function Home({route}) {
   const isFocused = useIsFocused();
 
   const [isApproved, setIsApproved] = useState(false)
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
+  const latestCompetition = competitions?.[0];
+  const latestLevelColor = getLevelColor(latestCompetition?.level);
 
 
   useEffect(() => {
@@ -482,6 +486,170 @@ export default function Home({route}) {
             </TouchableOpacity>
           </View>
         </View>
+
+        {!!latestCompetition && (
+          <View style={{ paddingHorizontal: 16, marginTop: 26 }}>
+            <TouchableOpacity
+              activeOpacity={0.88}
+              onPress={() => {
+                navigation.navigate('CompetitionDetail', {
+                  competitionId: latestCompetition.id,
+                });
+              }}
+              style={{
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: isDark ? '#4A2A16' : '#F2D2BC',
+                backgroundColor: isDark ? '#2A150B' : '#FFF4EC',
+                padding: 14,
+                overflow: 'hidden',
+              }}
+            >
+              <View
+                style={{
+                  position: 'absolute',
+                  right: -18,
+                  top: -18,
+                  width: 90,
+                  height: 90,
+                  borderRadius: 45,
+                  backgroundColor: isDark ? '#EB692522' : '#EB692518',
+                }}
+              />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 10,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <View
+                    style={{
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 6,
+                      backgroundColor: theme.accent,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: '#000',
+                        fontSize: 11,
+                        fontWeight: '700',
+                        letterSpacing: 0.3,
+                      }}
+                    >
+                      NEW
+                    </Text>
+                  </View>
+                  <Text
+                    style={{
+                      color: theme.accent,
+                      fontSize: 12,
+                      fontWeight: '700',
+                    }}
+                  >
+                    Competition Alert
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6,
+                    paddingHorizontal: 10,
+                    paddingVertical: 4,
+                    borderRadius: 20,
+                    borderWidth: 1,
+                    borderColor: `${latestLevelColor}55`,
+                    backgroundColor: isDark
+                      ? `${latestLevelColor}22`
+                      : `${latestLevelColor}18`,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: 6,
+                      backgroundColor: latestLevelColor,
+                    }}
+                  />
+                  <Text
+                    style={{
+                      color: latestLevelColor,
+                      fontSize: 11,
+                      fontWeight: '700',
+                    }}
+                  >
+                    {latestCompetition.level}
+                  </Text>
+                </View>
+              </View>
+
+              <Text
+                style={{
+                  color: theme.text,
+                  fontSize: 16,
+                  fontWeight: '700',
+                  lineHeight: 22,
+                  marginBottom: 6,
+                }}
+                numberOfLines={2}
+              >
+                {latestCompetition.name}
+              </Text>
+              <Text
+                style={{
+                  color: theme.textSecondary,
+                  fontSize: 13,
+                  fontWeight: '400',
+                  lineHeight: 19,
+                  marginBottom: 12,
+                }}
+                numberOfLines={2}
+              >
+                New competition added. Tap to view events and apply.
+              </Text>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Text
+                  style={{
+                    color: theme.textMuted,
+                    fontSize: 12,
+                    fontWeight: '600',
+                  }}
+                >
+                  {moment(latestCompetition.from_date).format('DD MMM')} -{' '}
+                  {moment(latestCompetition.to_date).format('DD MMM YYYY')}
+                </Text>
+                <Text
+                  style={{
+                    color: theme.accent,
+                    fontSize: 13,
+                    fontWeight: '700',
+                  }}
+                >
+                  View details
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
 
         <PsycologicalSkills isTrstPer={courseObj?.test_permission == 1 ? true : false} testQuestios={courseObj?.courseObject?.psychological_questions} testArr={courseObj?.test_percentage}/>
 

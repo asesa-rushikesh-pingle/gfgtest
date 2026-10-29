@@ -25,6 +25,8 @@ import WeaponCarryingLetterList from "./screens/WeaponCarryingLetterList"
 import Settings from "./screens/Settings"
 import PrivacyPolicy from "./screens/PrivacyPolicy"
 import TermsConditions from "./screens/TermsConditions"
+import CompetitionList from "./screens/CompetitionList"
+import CompetitionDetail from "./screens/CompetitionDetail"
 import { ThemeProvider } from "./context/ThemeContext"
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -234,6 +236,8 @@ export default function App() {
     <Stack.Screen name="Settings" component={Settings} />
     <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
     <Stack.Screen name="TermsConditions" component={TermsConditions} />
+    <Stack.Screen name="CompetitionList" component={CompetitionList} />
+    <Stack.Screen name="CompetitionDetail" component={CompetitionDetail} />
     </Stack.Navigator>
     </NavigationContainer>
     </ThemeProvider>
