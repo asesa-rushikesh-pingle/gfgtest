@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getData } from '../helper/callApi';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
 
 function formatDate(value) {
   if (!value) {
@@ -45,6 +46,7 @@ export default function WeaponCarryingLetterList() {
   const nav = useNavigation();
   const isFocused = useIsFocused();
   const listControllerRef = useRef(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (isFocused) {
@@ -76,17 +78,17 @@ export default function WeaponCarryingLetterList() {
   }
 
   return (
-    <View style={styles.parentWrapper}>
+    <View style={[styles.parentWrapper, { backgroundColor: theme.background }]}>
       <TitleBar title={'Weapon Carrying Letter'} setSafeAreaHeight={setSafeAreaHeight} />
       <ScrollView
         style={{ paddingTop: safeAreaHeight }}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={getListFn} tintColor="#EB6925" />
+          <RefreshControl refreshing={isLoading} onRefresh={getListFn} tintColor={theme.accent} />
         }
       >
         <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
           {list?.length == 0 && !isLoading && (
-            <Text style={stylesNew.emptyTitle}>
+            <Text style={[stylesNew.emptyTitle, { color: theme.text }]}>
               No letters found{'\n'}
               
             </Text>
@@ -95,9 +97,9 @@ export default function WeaponCarryingLetterList() {
           {list?.map((item, index) => {
             const canEdit = Number(item?.approval_status) === 0;
             return (
-              <View key={item?.id || index} style={stylesNew.card}>
+              <View key={item?.id || index} style={[stylesNew.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
                 <View style={stylesNew.cardTop}>
-                  <Text style={stylesNew.refNo} numberOfLines={1}>
+                  <Text style={[stylesNew.refNo, { color: theme.accent }]} numberOfLines={1}>
                     {item?.ref_no || `Letter #${item?.id}`}
                   </Text>
                   <Text style={[stylesNew.status, { color: getApprovalColor(item?.approval_status) }]}>
@@ -105,18 +107,18 @@ export default function WeaponCarryingLetterList() {
                   </Text>
                 </View>
 
-                <Text style={stylesNew.routeText}>
+                <Text style={[stylesNew.routeText, { color: theme.text }]}>
                   {item?.from_location || '--'} → {item?.to_location || '--'}
                 </Text>
-                <Text style={stylesNew.metaText}>Mode: {item?.travel_mode || '--'}</Text>
-                <Text style={stylesNew.metaText}>
+                <Text style={[stylesNew.metaText, { color: theme.textSecondary }]}>Mode: {item?.travel_mode || '--'}</Text>
+                <Text style={[stylesNew.metaText, { color: theme.textSecondary }]}>
                   Travel: {formatDate(item?.start_date)} - {formatDate(item?.end_date)}
                 </Text>
-                <Text style={stylesNew.metaText}>Purpose: {item?.purpose || '--'}</Text>
+                <Text style={[stylesNew.metaText, { color: theme.textSecondary }]}>Purpose: {item?.purpose || '--'}</Text>
                 {!!item?.weapons && (
-                  <Text style={stylesNew.metaText}>Weapons: {item.weapons}</Text>
+                  <Text style={[stylesNew.metaText, { color: theme.textSecondary }]}>Weapons: {item.weapons}</Text>
                 )}
-                <Text style={stylesNew.createdText}>
+                <Text style={[stylesNew.createdText, { color: theme.textMuted }]}>
                   Created: {formatDate(item?.created_date)}
                 </Text>
 
@@ -124,9 +126,9 @@ export default function WeaponCarryingLetterList() {
                   {!!item?.certificate_url && (
                     <TouchableOpacity
                       onPress={() => Linking.openURL(item.certificate_url)}
-                      style={stylesNew.actionBtn}
+                      style={[stylesNew.actionBtn, { backgroundColor: theme.surfaceMuted }]}
                     >
-                      <Text style={stylesNew.actionBtnText}>View PDF</Text>
+                      <Text style={[stylesNew.actionBtnText, { color: theme.text }]}>View PDF</Text>
                     </TouchableOpacity>
                   )}
                   {canEdit && (
@@ -181,6 +183,7 @@ const stylesNew = StyleSheet.create({
     backgroundColor: '#202020',
     borderRadius: 16,
     marginBottom: 16,
+    borderWidth: 1,
   },
   cardTop: {
     flexDirection: 'row',

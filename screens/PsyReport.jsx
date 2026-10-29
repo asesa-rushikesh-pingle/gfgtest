@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getData, postJSONData} from '../helper/callApi'
 import RNPickerSelect from 'react-native-picker-select';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -35,6 +36,7 @@ export default function PsyReport({route}) {
      const [reportObj, setReportObj] = useState('')
 
      const nav = useNavigation()
+     const { theme } = useTheme()
 
      const paymentStatus = [
       {
@@ -128,16 +130,16 @@ export default function PsyReport({route}) {
     
 
   return (
-    <View style={styles.parentWrapper}>
+    <View style={[styles.parentWrapper, { backgroundColor: theme.background }]}>
     <TitleBar title={"Detail Mental Skill Values"} setSafeAreaHeight={setSafeAreaHeight}/>
     {/* <Footer/> */}
       <ScrollView style={{paddingTop : safeAreaHeight}}>
 
         <View style={{paddingHorizontal : 16}}>
-          <Text style={{fontSize : 20, fontWeight : '500',marginTop : 16, color : '#fff'}}>
+          <Text style={{fontSize : 20, fontWeight : '500',marginTop : 16, color : theme.text}}>
           {reportObj?.test_name}
           </Text>
-          <Text style={{fontSize : 12, fontWeight : '400',marginTop : 6, color : '#A8A8A8'}}>
+          <Text style={{fontSize : 12, fontWeight : '400',marginTop : 6, color : theme.textSecondary}}>
           {reportObj?.test_given_date}
           </Text>
 
@@ -145,11 +147,11 @@ export default function PsyReport({route}) {
           <View
             style={[
               styles.progressView,
-              { width: Dimensions.get('window').width - 32 },
+              { width: Dimensions.get('window').width - 32, backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border },
             ]}
           >
-            <Text style={styles.proTitle}>{reportObj?.grade}</Text>
-            <Text style={styles.percenten}>{Number(reportObj?.total_percentage).toFixed(0)}% </Text> 
+            <Text style={[styles.proTitle, { color: theme.textSecondary }]}>{reportObj?.grade}</Text>
+            <Text style={[styles.percenten, { color: theme.text }]}>{Number(reportObj?.total_percentage).toFixed(0)}% </Text> 
             <View
               style={{
                 flexDirection: 'row',
@@ -158,7 +160,7 @@ export default function PsyReport({route}) {
                 paddingBottom: 5,
                 borderBottomWidth: 0.5,
                 borderStyle: 'dashed',
-                borderBottomColor: '#A8A8A8',
+                borderBottomColor: theme.textSecondary,
               }}
             >
               {[
@@ -211,7 +213,7 @@ export default function PsyReport({route}) {
                       height: 15,
                       flex: 1,
                       backgroundColor:
-                        (40 * Number(reportObj?.total_percentage) ) / 100 >= itm ? Number(reportObj?.total_percentage) < 40 ? '#FE373B' : '#008644' : '#383838',
+                        (40 * Number(reportObj?.total_percentage) ) / 100 >= itm ? Number(reportObj?.total_percentage) < 40 ? '#FE373B' : '#008644' : theme.surfaceMuted,
                       borderRadius: 3,
                     }}
                   ></View>
@@ -219,33 +221,33 @@ export default function PsyReport({route}) {
               })}
             </View>
             <View style={styles.taLimitView}>
-              <Text style={styles.taTiLab}>0</Text>
-              <Text style={styles.taTiLab}>50</Text>
-              <Text style={styles.taTiLab}>100</Text>
+              <Text style={[styles.taTiLab, { color: theme.textSecondary }]}>0</Text>
+              <Text style={[styles.taTiLab, { color: theme.textSecondary }]}>50</Text>
+              <Text style={[styles.taTiLab, { color: theme.textSecondary }]}>100</Text>
             </View>
           </View>
           </View>
 
-          <Text style={{fontSize : 20, fontWeight : '700',marginTop : 26, color : '#fff'}}>
+          <Text style={{fontSize : 20, fontWeight : '700',marginTop : 26, color : theme.text}}>
           Conclusion,
           </Text>
-          <Text style={{fontSize : 14,lineHeight : 22, fontWeight : '400',marginTop : 6, color : '#A8A8A8'}}>
+          <Text style={{fontSize : 14,lineHeight : 22, fontWeight : '400',marginTop : 6, color : theme.textSecondary}}>
           This report highlights the seven essential mental skills required by the athlete. Regular mental training and continuous development of your mental capacities will help you perform consistently at your best. At Gun for Glory, we provide opportunities to enhance your mental abilities.
           </Text>
-          <Text style={{fontSize : 20, fontWeight : '700',marginTop : 26, color : '#fff'}}>
+          <Text style={{fontSize : 20, fontWeight : '700',marginTop : 26, color : theme.text}}>
           The chart below explains the seven mental skill values for the athlete
           </Text>
 
           <View style={{flexDirection : 'row', alignItems : 'center',justifyContent : 'flex-start', marginTop : 16}}>
             <View style={{width  : 35, height : 200, alignItems : 'flex-end', paddingRight : 3,justifyContent : 'space-between'}}>
-                <Text style={{fontSize : 10, color : '#A8A8A8', fontWeight : '400'}}>100 %</Text>
-                <Text style={{fontSize : 10, color : '#A8A8A8', fontWeight : '400'}}>80 %</Text>
-                <Text style={{fontSize : 10, color : '#A8A8A8', fontWeight : '400'}}>60 %</Text>
-                <Text style={{fontSize : 10, color : '#A8A8A8', fontWeight : '400'}}>40 %</Text>
-                <Text style={{fontSize : 10, color : '#A8A8A8', fontWeight : '400'}}>20 %</Text>
-                <Text style={{fontSize : 10, color : '#A8A8A8', fontWeight : '400'}}>00 %</Text>
+                <Text style={{fontSize : 10, color : theme.textSecondary, fontWeight : '400'}}>100 %</Text>
+                <Text style={{fontSize : 10, color : theme.textSecondary, fontWeight : '400'}}>80 %</Text>
+                <Text style={{fontSize : 10, color : theme.textSecondary, fontWeight : '400'}}>60 %</Text>
+                <Text style={{fontSize : 10, color : theme.textSecondary, fontWeight : '400'}}>40 %</Text>
+                <Text style={{fontSize : 10, color : theme.textSecondary, fontWeight : '400'}}>20 %</Text>
+                <Text style={{fontSize : 10, color : theme.textSecondary, fontWeight : '400'}}>00 %</Text>
             </View>
-            <ScrollView horizontal style={{flex : 1, height : 200, borderLeftWidth : .5,borderBottomWidth : .5, borderColor : '#848484', 
+            <ScrollView horizontal style={{flex : 1, height : 200, borderLeftWidth : .5,borderBottomWidth : .5, borderColor : theme.border, 
               // flexDirection : 'row', 
               // alignItems : 'flex-end', 
               // justifyContent : 'space-evenly'
@@ -265,12 +267,12 @@ export default function PsyReport({route}) {
 
           {reportObj?.details?.map((bar,barindex)=>{
                 return(
-                  <View key={barindex} style={{flexDirection : 'row', borderBottomWidth : .3, borderColor : '#383838',alignItems : 'center', justifyContent : 'space-between'}}>
+                  <View key={barindex} style={{flexDirection : 'row', borderBottomWidth : .3, borderColor : theme.border,alignItems : 'center', justifyContent : 'space-between'}}>
                   <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 16}} >
                   <View style={{width : 10, height :  10,borderRadius : 10, backgroundColor : bar.color}}></View>
-                  <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400', lineHeight :28 }}>{bar?.finding_name}</Text>
+                  <Text style={{color : theme.textSecondary, fontSize : 12, fontWeight : '400', lineHeight :28 }}>{bar?.finding_name}</Text>
                   </View>
-                  <Text style={{color : '#fff', fontSize : 16, fontWeight : '600', lineHeight :28 }}>{Number(bar?.percentage)?.toFixed(0)}%</Text>
+                  <Text style={{color : theme.text, fontSize : 16, fontWeight : '600', lineHeight :28 }}>{Number(bar?.percentage)?.toFixed(0)}%</Text>
                 </View>
                 )
               })}
@@ -278,18 +280,18 @@ export default function PsyReport({route}) {
           </View>
 
 
-          <Text style={{fontSize : 14, fontWeight : '400',marginTop : 26,lineHeight : 22, color : '#A8A8A8'}}>
+          <Text style={{fontSize : 14, fontWeight : '400',marginTop : 26,lineHeight : 22, color : theme.textSecondary}}>
           Psychological profile reveals a clear distinction between areas of strength and those that require focused improvement.
           </Text>
 
-          <View style={{marginTop : 16, padding : 10, borderRadius : 16, borderColor : '#383838', borderWidth : .5}}>
+          <View style={{marginTop : 16, padding : 10, borderRadius : 16, borderColor : theme.border, borderWidth : 1, backgroundColor: theme.card}}>
 
           {reportObj?.details?.map((bar,barindex,arr)=>{
                 return(
                   <View key={barindex}>
-                  <Text style={{fontSize : 16, fontWeight : '500',marginBottom : 6, color : '#fff'}}>{bar.finding_name}</Text>
-                  <Text style={{fontSize : 14, fontWeight : '400',lineHeight : 22, color : '#A8A8A8'}}>{bar?.finding_description || ''}</Text>
-                  <View style={{height : .5, backgroundColor : (barindex == (arr.length - 1)) ? 'black' :'#383838',marginTop : 8,marginBottom : (barindex == (arr.length - 1)) ? 0 :8}}></View>
+                  <Text style={{fontSize : 16, fontWeight : '500',marginBottom : 6, color : theme.text}}>{bar.finding_name}</Text>
+                  <Text style={{fontSize : 14, fontWeight : '400',lineHeight : 22, color : theme.textSecondary}}>{bar?.finding_description || ''}</Text>
+                  <View style={{height : .5, backgroundColor : (barindex == (arr.length - 1)) ? 'transparent' : theme.border,marginTop : 8,marginBottom : (barindex == (arr.length - 1)) ? 0 :8}}></View>
                   </View>
                 )
               })}

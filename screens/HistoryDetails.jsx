@@ -23,6 +23,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Dropdown } from 'react-native-element-dropdown';
 import DatePicker from 'react-native-date-picker';
+import { useTheme } from '../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 export default function HistoryDetails({ route }) {
@@ -54,6 +55,7 @@ export default function HistoryDetails({ route }) {
   const nav = useNavigation();
 
   const inset = useSafeAreaInsets();
+  const { theme, isDark } = useTheme();
 
   const data = [
     { label: 'This Month', value: '1' },
@@ -97,7 +99,7 @@ export default function HistoryDetails({ route }) {
   };
 
   return (
-    <View style={styles.parentWrapper}>
+    <View style={[styles.parentWrapper, { backgroundColor: theme.background }]}>
       <View
         onLayout={event => {
           const { height } = event.nativeEvent.layout;
@@ -115,7 +117,7 @@ export default function HistoryDetails({ route }) {
       >
         <BlurView
           style={styles.absolute}
-          blurType="dark"
+          blurType={theme.blurType}
           blurAmount={1}
           // overlayColor="transparent"
           // reducedTransparencyFallbackColor="white"
@@ -129,10 +131,10 @@ export default function HistoryDetails({ route }) {
           >
             <Image
               source={require('../assets/images/backBtn.png')}
-              style={{ width: 24, aspectRatio: 1, height: undefined }}
+              style={{ width: 24, aspectRatio: 1, height: undefined, tintColor: isDark ? undefined : theme.text }}
             />
           </TouchableOpacity>
-          <Text style={styles.pageBarTitle}>{dateString}</Text>
+          <Text style={[styles.pageBarTitle, { color: theme.text }]}>{dateString}</Text>
           <TouchableOpacity
             onPress={() => {
               dropdownRef.current?.open();
@@ -156,10 +158,10 @@ export default function HistoryDetails({ route }) {
         <View style={{ paddingHorizontal: 16 }}>
           {historyList?.map((elem,index)=>{
             return(
-          <View key={index} style={{borderColor : 'rgba(245, 245, 245, 0.5)',padding : 16,borderRadius : 10, borderWidth : .5, marginBottom : 20}}>
+          <View key={index} style={{borderColor : theme.border, backgroundColor: theme.card, padding : 16,borderRadius : 10, borderWidth : 1, marginBottom : 20}}>
           <View style={[styles.courseContentt, { marginBottom: 10 }]}>
             <Text
-              style={[styles.coHeadinggg, { marginTop: 16, marginBottom: 8 }]}
+              style={[styles.coHeadinggg, { marginTop: 16, marginBottom: 8, color: theme.text }]}
             >
               {elem?.course_name
               }
@@ -172,7 +174,7 @@ export default function HistoryDetails({ route }) {
                 alignItems: 'center',
               }}
             >
-              <Text style={styles.staMonthText}>{elem?.days} Days</Text>
+              <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>{elem?.days} Days</Text>
               <View
                 style={{
                   backgroundColor: '#A8A8A8',
@@ -189,7 +191,7 @@ export default function HistoryDetails({ route }) {
                   flex: 1,
                 }}
               >
-                <Text style={styles.staMonthText}>Started {elem?.course_start_date
+                <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>Started {elem?.course_start_date
                 }</Text>
                 <View
                   style={{
@@ -211,7 +213,7 @@ export default function HistoryDetails({ route }) {
                       outlineOffset: 2,
                     }}
                   ></View>
-                  <Text style={styles.staMonthText}>In Progress</Text>
+                  <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>In Progress</Text>
                 </View>
               </View>
             </View>
@@ -225,7 +227,7 @@ export default function HistoryDetails({ route }) {
               borderRadius: 5,
               borderWidth: 1,
               borderColor: '#2BA750',
-              backgroundColor: '#2B2B2B',
+              backgroundColor: theme.chip,
             }}
           >
             <View
@@ -249,13 +251,13 @@ export default function HistoryDetails({ route }) {
                 />
                 <View>
                   <Text
-                    style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}
+                    style={{ color: theme.text, fontSize: 16, fontWeight: '600' }}
                   >
                     {elem?.program_list?.length} Programs Completed
                   </Text>
                   <Text
                     style={{
-                      color: '#656565',
+                      color: theme.textMuted,
                       fontSize: 12,
                       fontWeight: '400',
                       marginTop: 6,
@@ -284,13 +286,13 @@ export default function HistoryDetails({ route }) {
                 padding: 10,
                 borderRadius: 10,
                 borderWidth: 0.5,
-                borderColor: '#383838',
+                borderColor: theme.border,
                 marginTop: 10,
               }}
             >
               <Text
                 style={{
-                  color: '#fff',
+                  color: theme.text,
                   fontSize: 16,
                   fontWeight: '500',
                 
@@ -301,7 +303,7 @@ export default function HistoryDetails({ route }) {
               </Text>
               {program?.course_category_name && <Text
                 style={{
-                  color: '#A8A8A8',
+                  color: theme.textSecondary,
                   fontSize: 14,
                   fontWeight: '400',
                   marginBottom: 0,
@@ -313,7 +315,7 @@ export default function HistoryDetails({ route }) {
               {program?.completedDateTime ? (
                 <Text
                   style={{
-                    color: '#656565',
+                    color: theme.textMuted,
                     fontSize: 12,
                     fontWeight: '400',
                     marginTop: 8,
@@ -357,7 +359,7 @@ export default function HistoryDetails({ route }) {
                     fontSize: 16,
                     fontWeight: '600',
                     lineHeight: 22,
-                    color: 'white',
+                    color: theme.text,
                   }}
                 >
                   General Practice
@@ -377,7 +379,7 @@ export default function HistoryDetails({ route }) {
               style={{
                 padding: 10,
                 borderRadius: 16,
-                borderColor: '#383838',
+                borderColor: theme.border,
                 borderWidth: 0.5,
               }}
             >
@@ -386,7 +388,7 @@ export default function HistoryDetails({ route }) {
                   style={{
                     fontSize: 14,
                     textAlign: 'center',
-                    color: '#A8A8A8',
+                    color: theme.textSecondary,
                     lineHeight: 30,
                   }}
                 >
@@ -410,7 +412,7 @@ export default function HistoryDetails({ route }) {
                         alignItems: 'center',
                       }}
                     >
-                      <Text style={styles.staMonthText}>{note?.display_created_date}</Text>
+                      <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>{note?.display_created_date}</Text>
                       <View
                         style={{
                           backgroundColor: '#A8A8A8',
@@ -419,7 +421,7 @@ export default function HistoryDetails({ route }) {
                           borderRadius: 5,
                         }}
                       ></View>
-                      <Text style={styles.staMonthText}>{note?.edited_before_span}</Text>
+                      <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>{note?.edited_before_span}</Text>
                     </View>
 
                     <TouchableOpacity>
@@ -433,7 +435,7 @@ export default function HistoryDetails({ route }) {
                     style={{
                       marginTop: 10,
                       fontSize: 16,
-                      color: '#A8A8A8',
+                      color: theme.textSecondary,
                       fontWeight: '600',
                     }}
                   >
@@ -443,7 +445,7 @@ export default function HistoryDetails({ route }) {
                     style={{
                       marginTop: 10,
                       fontSize: 14,
-                      color: '#656565',
+                      color: theme.textMuted,
                       fontWeight: '400',
                     }}
                   >
@@ -458,8 +460,8 @@ export default function HistoryDetails({ route }) {
                   key={commentIndex}
                     style={{
                       borderRadius: 10,
-                      borderColor: '#656565',
-                      backgroundColor: '#202020',
+                      borderColor: theme.border,
+                      backgroundColor: theme.card,
                       borderWidth: 1,
                       marginTop: 13,
                       padding: 10,
@@ -475,8 +477,8 @@ export default function HistoryDetails({ route }) {
                         height: 20,
                         width: 20,
                         borderWidth: 1,
-                        borderColor: '#656565',
-                        backgroundColor: '#656565',
+                        borderColor: theme.border,
+                        backgroundColor: theme.textMuted,
                       }}
                     ></View>
                     <View
@@ -509,7 +511,7 @@ export default function HistoryDetails({ route }) {
                             style={[
                               styles.staMonthText,
                               {
-                                color: 'white',
+                                color: theme.text,
                                 fontSize: 14,
                                 fontWeight: '500',
                               },
@@ -525,19 +527,19 @@ export default function HistoryDetails({ route }) {
                               borderRadius: 5,
                             }}
                           ></View>
-                          <Text style={styles.staMonthText}>{commnet?.note_created_by?.designation}</Text>
+                          <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>{commnet?.note_created_by?.designation}</Text>
                         </View>
-                        <Text style={styles.staMonthText}>{commnet?.display_created_time}</Text>
+                        <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>{commnet?.display_created_time}</Text>
                       </View>
                     </View>
                     <View style={{ marginTop: 16, alignItems: 'flex-start' }}>
                       <Text
                         style={{
-                          backgroundColor: '#383838',
+                          backgroundColor: theme.surfaceMuted,
                           paddingVertical: 3,
                           paddingHorizontal: 5,
                           borderRadius: 5,
-                          color: 'white',
+                          color: theme.text,
                           fontSize: 12,
                         }}
                       >
@@ -551,7 +553,7 @@ export default function HistoryDetails({ route }) {
                   <View
                     style={{
                       marginVertical: 10,
-                      borderTopColor: '#383838',
+                      borderTopColor: theme.border,
                       borderTopWidth: 0.5,
                     }}
                   ></View>
@@ -589,7 +591,7 @@ export default function HistoryDetails({ route }) {
                     fontSize: 16,
                     fontWeight: '600',
                     lineHeight: 22,
-                    color: 'white',
+                    color: theme.text,
                   }}
                 >
                   Training / Score Card
@@ -609,7 +611,7 @@ export default function HistoryDetails({ route }) {
               style={{
                 padding: 10,
                 borderRadius: 16,
-                borderColor: '#383838',
+                borderColor: theme.border,
                 borderWidth: 0.5,
               }}
             >
@@ -618,7 +620,7 @@ export default function HistoryDetails({ route }) {
                   style={{
                     fontSize: 14,
                     textAlign: 'center',
-                    color: '#A8A8A8',
+                    color: theme.textSecondary,
                     lineHeight: 30,
                   }}
                 >
@@ -642,7 +644,7 @@ export default function HistoryDetails({ route }) {
                         alignItems: 'center',
                       }}
                     >
-                      <Text style={styles.staMonthText}>{score?.display_created_date}</Text>
+                      <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>{score?.display_created_date}</Text>
                       <View
                         style={{
                           backgroundColor: '#A8A8A8',
@@ -651,7 +653,7 @@ export default function HistoryDetails({ route }) {
                           borderRadius: 5,
                         }}
                       ></View>
-                      <Text style={styles.staMonthText}>{score?.edited_before_span}</Text>
+                      <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>{score?.edited_before_span}</Text>
                     </View>
 
                     <TouchableOpacity>
@@ -665,7 +667,7 @@ export default function HistoryDetails({ route }) {
                     style={{
                       marginTop: 10,
                       fontSize: 16,
-                      color: '#A8A8A8',
+                      color: theme.textSecondary,
                       fontWeight: '600',
                     }}
                   >
@@ -690,13 +692,13 @@ export default function HistoryDetails({ route }) {
                               padding: 5,
                               borderRadius: 5,
                               borderWidth: 0.5,
-                              borderColor: '#383838',
+                              borderColor: theme.border,
                               width: (Dimensions.get('window').width - 101) / 5,
                             }}
                           >
                             <Text
                               style={{
-                                color: '#A8A8A8',
+                                color: theme.textSecondary,
                                 fontSize: 12,
                                 fontWeight: '400',
                                 textAlign: 'center',
@@ -706,7 +708,7 @@ export default function HistoryDetails({ route }) {
                             </Text>
                             <Text
                               style={{
-                                color: '#A8A8A8',
+                                color: theme.textSecondary,
                                 marginTop: 2,
                                 fontSize: 16,
                                 fontWeight: '600',
@@ -730,14 +732,14 @@ export default function HistoryDetails({ route }) {
                       columnGap: 10,
                       padding: 5,
                       borderRadius: 6,
-                      borderColor: '#383838',
+                      borderColor: theme.border,
                       borderWidth: 1,
                       marginTop: 10,
                     }}
                   >
                     <Text
                       style={{
-                        color: '#A8A8A8',
+                        color: theme.textSecondary,
                         fontSize: 12,
                         fontWeight: '400',
                         textAlign: 'center',
@@ -747,7 +749,7 @@ export default function HistoryDetails({ route }) {
                     </Text>
                     <Text
                       style={{
-                        color: '#A8A8A8',
+                        color: theme.textSecondary,
                         marginTop: 2,
                         fontSize: 16,
                         fontWeight: '600',
@@ -762,8 +764,8 @@ export default function HistoryDetails({ route }) {
                   <View
                     style={{
                       borderRadius: 10,
-                      borderColor: '#656565',
-                      backgroundColor: '#202020',
+                      borderColor: theme.border,
+                      backgroundColor: theme.card,
                       borderWidth: 1,
                       marginTop: 13,
                       padding: 10,
@@ -780,8 +782,8 @@ export default function HistoryDetails({ route }) {
                         height: 20,
                         width: 20,
                         borderWidth: 1,
-                        borderColor: '#656565',
-                        backgroundColor: '#656565',
+                        borderColor: theme.border,
+                        backgroundColor: theme.textMuted,
                       }}
                     ></View>
                     <View
@@ -814,7 +816,7 @@ export default function HistoryDetails({ route }) {
                             style={[
                               styles.staMonthText,
                               {
-                                color: 'white',
+                                color: theme.text,
                                 fontSize: 14,
                                 fontWeight: '500',
                               },
@@ -830,19 +832,19 @@ export default function HistoryDetails({ route }) {
                               borderRadius: 5,
                             }}
                           ></View>
-                          <Text style={styles.staMonthText}> {score?.score_card_comment?.comment_created_by?.designation}</Text>
+                          <Text style={[styles.staMonthText, { color: theme.textSecondary }]}> {score?.score_card_comment?.comment_created_by?.designation}</Text>
                         </View>
-                        <Text style={styles.staMonthText}>{score?.score_card_comment?.display_created_time}</Text>
+                        <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>{score?.score_card_comment?.display_created_time}</Text>
                       </View>
                     </View>
                     <View style={{ marginTop: 16, alignItems: 'flex-start' }}>
                       <Text
                         style={{
-                          backgroundColor: '#383838',
+                          backgroundColor: theme.surfaceMuted,
                           paddingVertical: 3,
                           paddingHorizontal: 5,
                           borderRadius: 5,
-                          color: 'white',
+                          color: theme.text,
                           fontSize: 12,
                         }}
                       >
@@ -853,7 +855,7 @@ export default function HistoryDetails({ route }) {
                   <View
                     style={{
                       marginVertical: 10,
-                      borderTopColor: '#383838',
+                      borderTopColor: theme.border,
                       borderTopWidth: 0.5,
                     }}
                   ></View>

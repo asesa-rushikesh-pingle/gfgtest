@@ -7,10 +7,12 @@ import { BlurView } from "@react-native-community/blur";
 import styles from '../Style'
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function Header({setSafeAreaHeight}) {
   const nav = useNavigation()
   const inset = useSafeAreaInsets()
+  const { theme, isDark } = useTheme()
 
   const [branchName, setBranchName] = useState('')
   const [profileUrl, setProfileUrl] = useState('')
@@ -37,7 +39,7 @@ export default function Header({setSafeAreaHeight}) {
    style={{position : 'absolute', top : 0, left : 0, right : 0, backgroundColor : 'rgba(255, 192, 203, 0)', zIndex : 2,overflow : 'hidden'}}>
      <BlurView
    style={styles.absolute}
-   blurType="dark"
+   blurType={theme.blurType}
    blurAmount={1}
    // overlayColor="transparent" 
    // reducedTransparencyFallbackColor="white"
@@ -52,7 +54,7 @@ export default function Header({setSafeAreaHeight}) {
      <View style={styles.headComp}>
        <View  style={styles.leftHead}>
          <Image source={require('../../assets/images/logo.png')} style={{width : 66, aspectRatio : 66/43 , height : undefined}}  />
-         <Text style={styles.brachName}>GFG {'\n'}
+         <Text style={[styles.brachName, { color: theme.text }]}>GFG {'\n'}
          {branchName}</Text>
        </View>
 
@@ -61,9 +63,9 @@ export default function Header({setSafeAreaHeight}) {
           nav.navigate('Profile')
         }}>
           {profileUrl ? 
-          <Image source={{uri : profileUrl}} style={{width : 40, aspectRatio : 1 ,borderRadius : 50,borderColor : 'white', borderWidth : 1, height : undefined}}  />
+          <Image source={{uri : profileUrl}} style={{width : 40, aspectRatio : 1 ,borderRadius : 50,borderColor : isDark ? 'white' : theme.border, borderWidth : 1, height : undefined}}  />
           : 
-          <Image source={require('../../assets/images/user.png')} style={{width : 40, aspectRatio : 1 , height : undefined}}  />
+          <Image source={require('../../assets/images/user.png')} style={{width : 40, aspectRatio : 1 , height : undefined, tintColor: isDark ? undefined : theme.text}}  />
           }
         </TouchableOpacity>
 

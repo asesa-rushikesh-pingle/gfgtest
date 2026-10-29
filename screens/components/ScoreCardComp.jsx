@@ -7,12 +7,14 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import RNPickerSelect from 'react-native-picker-select';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getData,postFormData,postJSONData} from '../../helper/callApi'
+import { useTheme } from '../../context/ThemeContext'
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 
 
 const { width } = Dimensions.get('window');
 export default function ScoreCardComp({selectedDate,athleteCourseId,athleteCompletedCourseId}) {
+  const { theme, isDark } = useTheme()
   const [visible, setVisible] = useState(false);
 
 
@@ -219,7 +221,7 @@ const takePhoto = async (inndexx) => {
         }
 
   return (
-    <View style={{ padding: 10, borderRadius: 16, backgroundColor: '#202020' }}>
+    <View style={{ padding: 10, borderRadius: 16, backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }}>
       <View>
         <Text
           style={{
@@ -299,7 +301,7 @@ const takePhoto = async (inndexx) => {
             style={{
               marginTop: 10,
               fontSize: 16,
-              color: 'white',
+              color: theme.text,
               fontWeight: '600',
             }}
           >
@@ -310,7 +312,7 @@ const takePhoto = async (inndexx) => {
               return(
                 <View key={inx} style={{padding : 5, borderRadius : 5, backgroundColor : '#383838', width : (Dimensions.get('window').width - 100) / 5 }}>
                 <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400',textAlign : 'center'}}>{el?.key}</Text>
-                <Text style={{color : 'white',marginTop : 2, fontSize : 16, fontWeight : '600',lineHeight : 22,textAlign : 'center'}}>{el?.score || '00'}</Text>
+                <Text style={{color: theme.text,marginTop : 2, fontSize : 16, fontWeight : '600',lineHeight : 22,textAlign : 'center'}}>{el?.score || '00'}</Text>
                 <Image
                
             //  source={{uri : 'https://vivopune.com/backend/public/products-images/x300-pro-10347361-1764826527_0.webp'}}
@@ -329,7 +331,7 @@ const takePhoto = async (inndexx) => {
           </View>
           <View style={{flexDirection : 'row', alignItems : 'center',justifyContent : 'center', columnGap : 10,padding :5,borderRadius : 6, borderColor : '#383838', borderWidth : 1,marginTop : 10,}}>
           <Text style={{color : '#A8A8A8', fontSize : 12, fontWeight : '400',textAlign : 'center'}}>Total Score</Text>
-            <Text style={{color : 'white',marginTop : 2, fontSize : 16, fontWeight : '600',lineHeight : 22,textAlign : 'center'}}>{item?.totalScoreCard || '00'            }</Text>
+            <Text style={{color: theme.text,marginTop : 2, fontSize : 16, fontWeight : '600',lineHeight : 22,textAlign : 'center'}}>{item?.totalScoreCard || '00'            }</Text>
             
           </View>
           <View
@@ -374,12 +376,12 @@ const takePhoto = async (inndexx) => {
             <View style={{marginTop : 100}}></View>
           <BlurView
             style={styles.absolute}
-            blurType="dark"
+            blurType={theme.blurType}
             blurAmount={1}
             // overlayColor="transparent"
             // reducedTransparencyFallbackColor="white"
           />
-          <View style={{backgroundColor : 'black', flex : 1}}>
+          <View style={{backgroundColor : theme.background, flex : 1}}>
 
           
           <View style={{ paddingVertical: 20, paddingHorizontal: 16 }}>
@@ -388,7 +390,7 @@ const takePhoto = async (inndexx) => {
                 fontSize: 16,
                 fontWeight: '600',
                 lineHeight: 22,
-                color: 'white',
+                color: theme.text,
                 textAlign: 'center',
               }}
             >
@@ -409,8 +411,8 @@ const takePhoto = async (inndexx) => {
       items={catList}
     >
       <View style={{paddingHorizontal : 16, }}>
-        <View style={{paddingVertical : 12, paddingHorizontal : 16, borderRadius : 16, backgroundColor : '#202020', flexDirection : 'row', alignItems : 'center',justifyContent : 'space-between'}}>
-            <Text style={{color : 'white', fontWeight : '500', fontSize : 16}}>{catList?.find((it)=> it.value == selectedCategoryId)?.label  || 'Choose option'}</Text>
+        <View style={{paddingVertical : 12, paddingHorizontal : 16, borderRadius : 16, backgroundColor: theme.card, flexDirection : 'row', alignItems : 'center',justifyContent : 'space-between'}}>
+            <Text style={{color: theme.text, fontWeight : '500', fontSize : 16}}>{catList?.find((it)=> it.value == selectedCategoryId)?.label  || 'Choose option'}</Text>
             <Image style={{width : 24, height : undefined , aspectRatio : 1}} source={require('../../assets/images/donArrr.png')}/>
         </View>
         </View>

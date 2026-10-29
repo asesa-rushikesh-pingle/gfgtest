@@ -6,6 +6,7 @@ import GeneralPracticeComp from '../components/GeneralPracticeComp'
 import ScoreCardComp from '../components/ScoreCardComp'
 import ScoreCardCompByCoach from '../components/ScoreCardCompByCoach'
 import MentailTrainingComp from '../components/MentailTrainingComp'
+import { useTheme } from '../../context/ThemeContext'
 
 const SECTIONS = [
     {
@@ -36,6 +37,7 @@ const SECTIONS = [
 
 
 export default function DiaryTabs({selectedDate,athleteCourseId,athleteCompletedCourseId}) {
+  const { theme, isDark } = useTheme()
 
   const SECTIONS_BY_COACH = [
    
@@ -70,7 +72,7 @@ export default function DiaryTabs({selectedDate,athleteCourseId,athleteCompleted
 
     const renderSectionTitle = (section) => (
         <View style={styles.content}>
-          {/* <Text style={{color : 'white'}}>{section.title}</Text> */}
+          {/* <Text style={{color : theme.text}}>{section.title}</Text> */}
         </View>
       );
 
@@ -78,7 +80,7 @@ export default function DiaryTabs({selectedDate,athleteCourseId,athleteCompleted
         <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between'}}>
             <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 10,paddingVertical : 11}}>
               <Image source={section.image} style={{height : undefined, width : 22, aspectRatio :1, }}/>
-              <Text style={{fontSize : 16 , fontWeight : '600', lineHeight : 22, color : 'white'}}>{section.title}</Text>
+              <Text style={{fontSize : 16 , fontWeight : '600', lineHeight : 22, color : theme.text}}>{section.title}</Text>
             </View>
             <Image source={require('../../assets/images/riarrhere.png')} style={{height : undefined, width : 24, aspectRatio :1, transform: [{ rotate:  activeSections.includes(section.index) ? '90deg' :  '0deg' }] }}/>
 
@@ -88,7 +90,7 @@ export default function DiaryTabs({selectedDate,athleteCourseId,athleteCompleted
       //   <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between'}}>
       //       <View style={{flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start', columnGap : 10,paddingVertical : 11}}>
       //         <Image source={section.image} style={{height : undefined, width : 22, aspectRatio :1, }}/>
-      //         <Text style={{fontSize : 16 , fontWeight : '600', lineHeight : 22, color : 'white'}}>{section.title}</Text>
+      //         <Text style={{fontSize : 16 , fontWeight : '600', lineHeight : 22, color : theme.text}}>{section.title}</Text>
       //       </View>
       //       <Image source={require('../../assets/images/riarrhere.png')} style={{height : undefined, width : 24, aspectRatio :1, transform: [{ rotate:  activeSectionsByCoach.includes(section.index) ? '90deg' :  '0deg' }] }}/>
 
@@ -98,7 +100,7 @@ export default function DiaryTabs({selectedDate,athleteCourseId,athleteCompleted
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 10, paddingVertical: 11 }}>
             <Image source={section.image} style={{ width: 22, aspectRatio: 1 }} />
-            <Text style={{ fontSize: 16, fontWeight: '600', color: 'white' }}>
+            <Text style={{ fontSize: 16, fontWeight: '600', color: theme.text }}>
               {section.title}
             </Text>
           </View>
@@ -141,15 +143,15 @@ export default function DiaryTabs({selectedDate,athleteCourseId,athleteCompleted
 
   return (
     <View style={{marginTop : 25, paddingHorizontal : 16}}>
-        <View style={{flexDirection : 'row',padding : 2, backgroundColor : '#202020', borderRadius : 8,marginBottom : 25,}}>
+        <View style={{flexDirection : 'row',padding : 2, backgroundColor : theme.card, borderRadius : 8,marginBottom : 25, borderWidth: 1, borderColor: theme.border}}>
             <TouchableOpacity style={{width : (Dimensions.get('window').width - 35) / 1,}} onPress={()=>{setActiveTab('My Diary')}} >
-                <Text style={{backgroundColor : activeTab == 'My Diary' ?  '#636366' : 'transparent', textAlign : 'center',  paddingVertical : 6, paddingHorizontal : 8, borderRadius : 7,  color : 'white', fontSize : 13, lineHeight : 20, fontWeight : '400'}}>My Diary</Text>
+                <Text style={{backgroundColor : activeTab == 'My Diary' ?  (isDark ? '#636366' : theme.surfaceMuted) : 'transparent', textAlign : 'center',  paddingVertical : 6, paddingHorizontal : 8, borderRadius : 7,  color : theme.text, fontSize : 13, lineHeight : 20, fontWeight : '400'}}>My Diary</Text>
             </TouchableOpacity>
             {/* <TouchableOpacity style={{width : (Dimensions.get('window').width - 32 )/ 3,}} onPress={()=>{setActiveTab('By Coach')}} >
-                <Text style={{backgroundColor : activeTab == 'By Coach' ?  '#636366' : 'transparent', textAlign : 'center',  paddingVertical : 6, paddingHorizontal : 8, borderRadius : 7, color : 'white', fontSize : 13, lineHeight : 20, fontWeight : '400'}}>By Coach</Text>
+                <Text style={{backgroundColor : activeTab == 'By Coach' ?  '#636366' : 'transparent', textAlign : 'center',  paddingVertical : 6, paddingHorizontal : 8, borderRadius : 7, color : theme.text, fontSize : 13, lineHeight : 20, fontWeight : '400'}}>By Coach</Text>
             </TouchableOpacity>
             <TouchableOpacity style={{width : (Dimensions.get('window').width - 32) / 3,}} onPress={()=>{setActiveTab('Mood')}}>
-                <Text style={{backgroundColor : activeTab == 'Mood' ?  '#636366' : 'transparent', textAlign : 'center',  paddingVertical : 6, paddingHorizontal : 8, borderRadius : 7, color : 'white', fontSize : 13, lineHeight : 20, fontWeight : '400'}}>Mood</Text>
+                <Text style={{backgroundColor : activeTab == 'Mood' ?  '#636366' : 'transparent', textAlign : 'center',  paddingVertical : 6, paddingHorizontal : 8, borderRadius : 7, color : theme.text, fontSize : 13, lineHeight : 20, fontWeight : '400'}}>Mood</Text>
             </TouchableOpacity> */}
         </View>
 

@@ -4,6 +4,7 @@ import styles from '../Style'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { postJSONData } from '../../helper/callApi'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[]}) {
     const [visible, setVisible] = useState(false)
@@ -12,6 +13,7 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
     const [spycologicalTestId, setSpycologicalTestId] = useState('')
     const nav = useNavigation()
     const [isLoading, setIsLoading] = useState(false)
+    const { theme, isDark } = useTheme()
 
 
     async function setAnsQue(ansId) {
@@ -104,15 +106,15 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
     <View style={styles.moodTitleBox}>
       <Image
         source={require('../../assets/icons/psy.png')}
-        style={{ width: 24, aspectRatio: 1, height: undefined }}
+        style={{ width: 24, aspectRatio: 1, height: undefined, tintColor: isDark ? undefined : theme.text }}
       />
-      <Text style={styles.moodLable}>Sport Psychological Skills</Text>
+      <Text style={[styles.moodLable, { color: theme.text }]}>Sport Psychological Skills</Text>
     </View>
-    <View style={styles.moodInner}>
+    <View style={[styles.moodInner, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
       {testArr?.map((test,testIndex)=>{
         return(
-          <View key={testIndex} style={{borderBottomWidth : .5, borderColor : '#383838', marginBottom : 5}}>
-        <Text style={[styles.staMonthText,{color : 'white', fontSize : 16,fontWeight : '500'}]}>{test?.test_name}</Text>
+          <View key={testIndex} style={{borderBottomWidth : .5, borderColor : theme.border, marginBottom : 5}}>
+        <Text style={[styles.staMonthText,{color : theme.text, fontSize : 16,fontWeight : '500'}]}>{test?.test_name}</Text>
 
               <View
         style={{
@@ -121,19 +123,19 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
           justifyContent: 'space-between',
         }}
       >
-        <Text style={styles.staMonthText}>{test?.created_date} </Text>
+        <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>{test?.created_date} </Text>
         <TouchableOpacity onPress={()=>{
           nav.navigate('PsyReport', {
             id: test.id})
         }}>
           <Image
             source={require('../../assets/images/rm.png')}
-            style={{ width: 30, aspectRatio: 1, height: undefined }}
+            style={{ width: 30, aspectRatio: 1, height: undefined, tintColor: isDark ? undefined : theme.text }}
           />
         </TouchableOpacity>
               </View>
               {/* <Text style={{marginTop : 10,marginBottom : 10, color  : 'white', fontSize : 16, fontWeight : '500'}}>{getGrade(Number(test?.total_percentage))}</Text> */}
-              <Text style={{marginTop : 10,marginBottom : 10, color  : 'white', fontSize : 16, fontWeight : '500'}}>{test.grade || ''}</Text>
+              <Text style={{marginTop : 10,marginBottom : 10, color  : theme.text, fontSize : 16, fontWeight : '500'}}>{test.grade || ''}</Text>
               <Text style={{marginBottom : 10, width: ((Dimensions.get('window').width - 52) * Number(test?.total_percentage)) / 100, color  : 'white', fontSize : 16, fontWeight : '500',paddingVertical : 1, paddingHorizontal : 10,backgroundColor : Number(test?.total_percentage) < 40 ? '#FF6568' : '#008644', borderRadius  : 4,lineHeight : 24}}>{Number(test?.total_percentage)?.toFixed(0)}%</Text>
 
 
@@ -148,10 +150,10 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
           
             <View style={{marginTop : 16,columnGap : 20, flexDirection : 'row', alignItems : 'center', justifyContent : 'flex-start'}}>
                 <View style={{flex : 1}}>
-                    <Text style={{color : 'white', fontSize : 16, fontWeight : '600'}}>
+                    <Text style={{color : theme.text, fontSize : 16, fontWeight : '600'}}>
                     Let’s check your sports mindset!
                     </Text>
-                    <Text style={{marginTop : 10,  color : '#A8A8A8', fontSize : 12, fontWeight : '600'}}>
+                    <Text style={{marginTop : 10,  color : theme.textSecondary, fontSize : 12, fontWeight : '600'}}>
                     How often do you feel or experience these while you’re in action? 
                     </Text>
 
@@ -459,10 +461,10 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
           setIsLoading(false)
         }} // Android back button
       >
-        <View style={{flex : 1, backgroundColor : 'black'}}>
+        <View style={{flex : 1, backgroundColor : theme.background}}>
             <View style={{paddingVertical : 20, paddingHorizontal : 16, flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between', }}>
-                <Text style={{color : '#656565', fontSize : 16, fontWeight : '600',opacity : (selectedQuestionNo > 0 && selectedQuestionNo <= questions?.length) ? 1 : 0}}><Text style={{color : '#fff', fontSize : 26, fontWeight : '600'}}>{selectedQuestionNo}</Text>/{questions?.length}</Text>
-            <Text style={{color : '#fff', fontSize : 16, fontWeight : '600'}}>Psychological Skills</Text>
+                <Text style={{color : theme.textMuted, fontSize : 16, fontWeight : '600',opacity : (selectedQuestionNo > 0 && selectedQuestionNo <= questions?.length) ? 1 : 0}}><Text style={{color : theme.text, fontSize : 26, fontWeight : '600'}}>{selectedQuestionNo}</Text>/{questions?.length}</Text>
+            <Text style={{color : theme.text, fontSize : 16, fontWeight : '600'}}>Psychological Skills</Text>
             <TouchableOpacity onPress={()=>{
                 setVisible(false)
                 setSelectedQuestionNo(null)
@@ -470,7 +472,7 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
             }}>
             <Image
             source={require('../../assets/icons/closeIcon.png')}
-            style={{ width: 32, aspectRatio: 1, height: undefined }}
+            style={{ width: 32, aspectRatio: 1, height: undefined, tintColor: isDark ? undefined : theme.text }}
           />
             </TouchableOpacity>
             </View>
@@ -482,11 +484,11 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
             source={require('../../assets/icons/brain.png')}
             style={{ width: 80, aspectRatio: 1, height: undefined }}
           />
-          <Text style={{color : 'white', fontSize : 24, fontWeight : '400'}}>Let’s check your {'\n'}
+          <Text style={{color : theme.text, fontSize : 24, fontWeight : '400'}}>Let’s check your {'\n'}
           sports mindset!</Text>
 
           <View>
-          <Text style={{color : '#656565', fontSize : 12, fontWeight : '600', textAlign : 'center'}}>The following are statements that athletes have used to describe their experiences. Please read each statement carefully, and then recall as accurately as possible how often you experience the same thing. There are no right or wrong answers. Do not spend too much time on any one statement.</Text>
+          <Text style={{color : theme.textMuted, fontSize : 12, fontWeight : '600', textAlign : 'center'}}>The following are statements that athletes have used to describe their experiences. Please read each statement carefully, and then recall as accurately as possible how often you experience the same thing. There are no right or wrong answers. Do not spend too much time on any one statement.</Text>
             
           <TouchableOpacity
               onPress={() => {
@@ -513,16 +515,16 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
                 // source={require(`../../assets/images/${questions?.find((it)=> it.queNo == 1)?.image}`)}
                 source={questions?.find((it)=> it.queNo == selectedQuestionNo)?.image} style={{width : Dimensions.get('window').width, height : undefined, aspectRatio : 1}} 
                 /> */}
-                <Text style={{color : 'white', backgroundColor : 'black', paddingHorizontal : 16, paddingVertical : 16, fontSize : 22, fontWeight : '500', marginBottom : 20}}>
+                <Text style={{color : theme.text, backgroundColor : theme.background, paddingHorizontal : 16, paddingVertical : 16, fontSize : 22, fontWeight : '500', marginBottom : 20}}>
                   {questions?.find((it)=> it.queNo == selectedQuestionNo)?.queText}
                   
                 </Text>
                 <View>
                 {questions?.find((it)=> it.queNo == selectedQuestionNo)?.options?.map((opt,optIndex)=>{
                   return (
-                    <TouchableOpacity key={optIndex} onPress={()=>{setAnsQue(opt?.id)}} style={{paddingLeft : '5%',marginTop : 10,marginHorizontal : 16, padding : 10,paddingVertical : 16, backgroundColor : '#2B2B2B', borderRadius : 10, flexDirection : 'row',alignItems : 'center', columnGap : 14}}>
+                    <TouchableOpacity key={optIndex} onPress={()=>{setAnsQue(opt?.id)}} style={{paddingLeft : '5%',marginTop : 10,marginHorizontal : 16, padding : 10,paddingVertical : 16, backgroundColor : theme.card, borderRadius : 10, borderWidth: 1, borderColor: theme.border, flexDirection : 'row',alignItems : 'center', columnGap : 14}}>
                     {/* <Image source={require('../../assets/images/opt1.png')} style={{width  : 40 , height : undefined, aspectRatio : 1}}/>  */}
-                    <Text style={{fontSize : 16 ,fontWeight : '600', color : 'white'}}>{opt?.optionText}</Text>
+                    <Text style={{fontSize : 16 ,fontWeight : '600', color : theme.text}}>{opt?.optionText}</Text>
                  </TouchableOpacity>
                   )
                 })}
@@ -538,10 +540,10 @@ export default function PsycologicalSkills({testArr=[],isTrstPer, testQuestios=[
             source={require('../../assets/images/pinkBrain.png')}
             style={{ width: 80, aspectRatio: 1, height: undefined }}
           />
-          <Text style={{color : 'white',textAlign : 'center', fontSize : 24, fontWeight : '400'}}>Great job ! {'\n'}
+          <Text style={{color : theme.text,textAlign : 'center', fontSize : 24, fontWeight : '400'}}>Great job ! {'\n'}
           Thank you for your time. 
           </Text>
-          <Text style={{color : '#A8A8A8',textAlign : 'center', fontSize : 14, fontWeight : '700'}}>
+          <Text style={{color : theme.textSecondary,textAlign : 'center', fontSize : 14, fontWeight : '700'}}>
           You will receive your mental skill value shortly.
           </Text>
 

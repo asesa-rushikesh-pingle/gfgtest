@@ -23,12 +23,14 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Dropdown } from 'react-native-element-dropdown';
 import DatePicker from 'react-native-date-picker'
+import { useTheme } from '../context/ThemeContext';
 
 
 
 const { width } = Dimensions.get('window');
 export default function History() {
   const [safeAreaHeight, setSafeAreaHeight] = useState(0);
+  const { theme } = useTheme();
 
   const [pedingAmount, setPedingAmount] = useState(0);
   const [bookingAmount, setBookingAmount] = useState(0);
@@ -99,7 +101,7 @@ export default function History() {
   };
 
   return (
-    <View style={styles.parentWrapper}>
+    <View style={[styles.parentWrapper, { backgroundColor: theme.background }]}>
       <View 
           onLayout={(event) => {
            const { height } = event.nativeEvent.layout;
@@ -108,7 +110,7 @@ export default function History() {
          style={{position : 'absolute', top : 0, left : 0, right : 0, backgroundColor : 'rgba(255, 192, 203, 0)', zIndex : 2,overflow : 'hidden'}}>
            <BlurView
          style={styles.absolute}
-         blurType="dark"
+         blurType={theme.blurType}
          blurAmount={1}
          // overlayColor="transparent" 
          // reducedTransparencyFallbackColor="white"
@@ -117,34 +119,35 @@ export default function History() {
          
            <View style={[styles.headComp,{paddingTop : inset.top + 10}]}>
             <TouchableOpacity onPress={()=>{nav.goBack()}}>
-            <Image source={require('../assets/images/backBtn.png')} style={{width : 24, aspectRatio : 1 , height : undefined}}  />
+            <Image source={require('../assets/images/backBtn.png')} style={{width : 24, aspectRatio : 1 , height : undefined, tintColor: theme.mode === 'light' ? theme.text : undefined}}  />
             </TouchableOpacity>
-            <Text style={styles.pageBarTitle}>{"History"}</Text>
+            <Text style={[styles.pageBarTitle, { color: theme.text }]}>{"History"}</Text>
             <TouchableOpacity onPress={()=>{
               dropdownRef.current?.open();
             }}> 
-            <Image source={require('../assets/images/filterIco.png')} style={{width : 32, aspectRatio : 1 , height : undefined}}  />
+            <Image source={require('../assets/images/filterIco.png')} style={{width : 32, aspectRatio : 1 , height : undefined, tintColor: theme.mode === 'light' ? theme.text : undefined}}  />
             <Dropdown
               ref={dropdownRef}
           style={[ { marginTop : 10, width : 200, position : 'absolute', right : 16, top : 30 }]}
           data={data}
 
           containerStyle={{
-            backgroundColor: '#121210',
+            backgroundColor: theme.dropdownBg,
             borderRadius: 16,
             borderWidth : .5,
+            borderColor: theme.border,
             overflow : 'hidden',
             paddingVertical : 6
           }}
           itemContainerStyle={{
             paddingVertical: 0,
             paddingHorizontal: 12,
-            borderBottomColor : 'gray'
+            borderBottomColor : theme.border
           }}
           itemTextStyle={{
             fontSize: 16,
             lineHeight : 16,
-            color: '#fff',
+            color: theme.text,
             fontWeight : '600',
             backgroundColor : 'transparent'
           }}
@@ -154,7 +157,7 @@ export default function History() {
           maxHeight={300}
           labelField="label"
           valueField="value"
-          activeColor="#000"
+          activeColor={theme.chip}
           // value={'hu'}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
@@ -186,19 +189,19 @@ export default function History() {
                   setOpenStartDatePicker(true)
 
                 }} style={{
-    width : ((Dimensions.get('window').width - 42) / 2), paddingVertical : 5, paddingHorizontal : 10, backgroundColor : '#202020', borderRadius : 10  
+    width : ((Dimensions.get('window').width - 42) / 2), paddingVertical : 5, paddingHorizontal : 10, backgroundColor : theme.card, borderRadius : 10, borderWidth: 1, borderColor: theme.border
   }}>
-                  <Text style={styles.dchtegray}>From Date</Text>
-                  <Text style={styles.dchtegraytm}>{ formatDate(fromDate) || '--'}</Text>
+                  <Text style={[styles.dchtegray, { color: theme.textSecondary }]}>From Date</Text>
+                  <Text style={[styles.dchtegraytm, { color: theme.text }]}>{ formatDate(fromDate) || '--'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>{
                   setOpenEndDatePicker(true)
 
                 }} style={{
-    width : ((Dimensions.get('window').width - 42) / 2), paddingVertical : 5, paddingHorizontal : 10, backgroundColor : '#202020', borderRadius : 10  
+    width : ((Dimensions.get('window').width - 42) / 2), paddingVertical : 5, paddingHorizontal : 10, backgroundColor : theme.card, borderRadius : 10, borderWidth: 1, borderColor: theme.border
   }}>
-                  <Text style={styles.dchtegray}>To Date</Text>
-                  <Text style={styles.dchtegraytm}>{ formatDate(toDate) || '--'}</Text>
+                  <Text style={[styles.dchtegray, { color: theme.textSecondary }]}>To Date</Text>
+                  <Text style={[styles.dchtegraytm, { color: theme.text }]}>{ formatDate(toDate) || '--'}</Text>
                 </TouchableOpacity>
 
                  
@@ -238,7 +241,7 @@ export default function History() {
 
 
         <View style={{ paddingHorizontal: 16 }}>
-          {historyList?.length == 0 && <Text style={{color : 'white',fontSize : 20, fontWeight : '400', marginTop  : 50,textAlign :'center'}}>Nothing to show</Text> }
+          {historyList?.length == 0 && <Text style={{color : theme.text,fontSize : 20, fontWeight : '400', marginTop  : 50,textAlign :'center'}}>Nothing to show</Text> }
           {historyList?.map((itemm,indexx)=>{
             return(
 
@@ -253,9 +256,11 @@ export default function History() {
            
             style={{
               padding: 10,
-              backgroundColor: '#202020',
+              backgroundColor: theme.card,
               borderRadius: 16,
               marginTop: 16,
+              borderWidth: 1,
+              borderColor: theme.border,
             }}
           >
             <View
@@ -282,12 +287,12 @@ export default function History() {
                     alignItems: 'center',
                     paddingHorizontal: 10,
                     borderRadius: 5,
-                    backgroundColor: '#383838',
+                    backgroundColor: theme.surfaceMuted,
                   }}
                 >
                   <Text
                     style={{
-                      color: '#A8A8A8',
+                      color: theme.textSecondary,
                       fontSize: 12,
                       fontWeight: '600',
                       marginBottom: 5,
@@ -296,13 +301,13 @@ export default function History() {
                     {itemm?.dateMonth}
                   </Text>
                   <Text
-                    style={{ color: '#fff', fontSize: 20, fontWeight: '700' }}
+                    style={{ color: theme.text, fontSize: 20, fontWeight: '700' }}
                   >
                    {itemm?.date}
                   </Text>
                 </View>
                 <Text
-                  style={{ color: '#fff', flexShrink : 1, width : '75%', fontSize: 18, fontWeight: '600' }}
+                  style={{ color: theme.text, flexShrink : 1, width : '75%', fontSize: 18, fontWeight: '600' }}
                 >
                   {itemm?.course_name}
                 </Text>

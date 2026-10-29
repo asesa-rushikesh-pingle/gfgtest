@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TextInputComp from './components/TextInputComp';
 import DatePicker from 'react-native-date-picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
 
 function parseDateValue(value) {
   if (!value) {
@@ -67,6 +68,7 @@ export default function WeaponCarryingLetter() {
   const scrollRef = useRef(null);
   const focusedNode = useRef(null);
   const detailControllerRef = useRef(null);
+  const { theme } = useTheme();
 
   function fillForm(item) {
     setTravelMode(item?.travel_mode || '');
@@ -273,7 +275,7 @@ export default function WeaponCarryingLetter() {
   }
 
   return (
-    <View style={styles.parentWrapper}>
+    <View style={[styles.parentWrapper, { backgroundColor: theme.background }]}>
       <TitleBar
         title={isEdit ? 'Edit Weapon Carrying Letter' : 'Weapon Carrying Letter'}
         setSafeAreaHeight={setSafeAreaHeight}
@@ -286,11 +288,11 @@ export default function WeaponCarryingLetter() {
         showsVerticalScrollIndicator={false}
       >
         <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
-          <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600', marginTop: 16 }}>
+          <Text style={{ color: theme.text, fontSize: 16, fontWeight: '600', marginTop: 16 }}>
             Weapon Carrying Letter Info
           </Text>
           {isFetching && (
-            <Text style={{ color: '#A8A8A8', fontSize: 14, fontWeight: '400', marginTop: 8 }}>
+            <Text style={{ color: theme.textSecondary, fontSize: 14, fontWeight: '400', marginTop: 8 }}>
               Loading certificate details...
             </Text>
           )}
@@ -301,33 +303,33 @@ export default function WeaponCarryingLetter() {
 
           <TouchableOpacity
             onPress={() => setOpenStartDatePicker(true)}
-            style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: '#202020', borderRadius: 10 }}
+            style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: theme.card, borderRadius: 10, borderWidth: 1, borderColor: theme.border }}
           >
-            <Text style={styles.dchtegray}>Travelling Date</Text>
-            <Text style={{ color: startDate ? '#fff' : '#656565', fontSize: 16, fontWeight: '500', marginTop: 6 }}>
+            <Text style={[styles.dchtegray, { color: theme.textSecondary }]}>Travelling Date</Text>
+            <Text style={{ color: startDate ? theme.text : theme.placeholder, fontSize: 16, fontWeight: '500', marginTop: 6 }}>
               {startDate ? moment(startDate).format('DD MMM YYYY') : 'Select travelling date'}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => setOpenEndDatePicker(true)}
-            style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: '#202020', borderRadius: 10 }}
+            style={{ marginTop: 16, paddingVertical: 12, paddingHorizontal: 16, backgroundColor: theme.card, borderRadius: 10, borderWidth: 1, borderColor: theme.border }}
           >
-            <Text style={styles.dchtegray}>Returning Date</Text>
-            <Text style={{ color: endDate ? '#fff' : '#656565', fontSize: 16, fontWeight: '500', marginTop: 6 }}>
+            <Text style={[styles.dchtegray, { color: theme.textSecondary }]}>Returning Date</Text>
+            <Text style={{ color: endDate ? theme.text : theme.placeholder, fontSize: 16, fontWeight: '500', marginTop: 6 }}>
               {endDate ? moment(endDate).format('DD MMM YYYY') : 'Select returning date'}
             </Text>
           </TouchableOpacity>
 
           <TextInputComp placeholder={'Purpose'} state={purpose} setState={setPurpose} onFocus={onInputFocus} />
 
-          <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600', marginTop: 24 }}>
+          <Text style={{ color: theme.text, fontSize: 16, fontWeight: '600', marginTop: 24 }}>
             Weapons
           </Text>
 
           {weaponList.map((weapon, index) => {
             return (
-              <View key={index} style={{ marginTop: 8, padding: 12, borderRadius: 10, backgroundColor: '#161616' }}>
+              <View key={index} style={{ marginTop: 8, padding: 12, borderRadius: 10, backgroundColor: theme.cardAlt, borderWidth: 1, borderColor: theme.border }}>
                 <TextInputComp
                   placeholder={'Weapon Caliber'}
                   state={weapon?.caliber}
@@ -372,7 +374,7 @@ export default function WeaponCarryingLetter() {
             }}
             style={{ marginTop: 16 }}
           >
-            <Text style={{ color: '#EB6925', fontSize: 16, fontWeight: '600' }}>+ Add Weapon</Text>
+            <Text style={{ color: theme.accent, fontSize: 16, fontWeight: '600' }}>+ Add Weapon</Text>
           </TouchableOpacity>
 
           <TextInputComp placeholder={'Pellets'} state={pellets} setState={setPellets} onFocus={onInputFocus} />

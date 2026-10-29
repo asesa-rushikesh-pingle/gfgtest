@@ -7,9 +7,11 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import RNPickerSelect from 'react-native-picker-select';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getData,postJSONData} from '../../helper/callApi'
+import { useTheme } from '../../context/ThemeContext'
 
 
 export default function GeneralPracticeComp({selectedDate,athleteCourseId,athleteCompletedCourseId}) {
+  const { theme, isDark } = useTheme()
   const [visible, setVisible] = useState(false);
 
   const [message, setMessage] = useState('')
@@ -108,7 +110,7 @@ export default function GeneralPracticeComp({selectedDate,athleteCourseId,athlet
       }
 
   return (
-    <View style={{ padding: 16, borderRadius: 16, backgroundColor: '#202020' }}>
+    <View style={{ padding: 16, borderRadius: 16, backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }}>
       <View>
         {notesList?.length == 0 &&
           <Text
@@ -182,7 +184,7 @@ export default function GeneralPracticeComp({selectedDate,athleteCourseId,athlet
             style={{
               marginTop: 10,
               fontSize: 16,
-              color: 'white',
+              color: theme.text,
               fontWeight: '600',
             }}
           >
@@ -238,12 +240,12 @@ export default function GeneralPracticeComp({selectedDate,athleteCourseId,athlet
             <View style={{marginTop : 100}}></View>
           <BlurView
             style={styles.absolute}
-            blurType="dark"
+            blurType={theme.blurType}
             blurAmount={1}
             // overlayColor="transparent"
             // reducedTransparencyFallbackColor="white"
           />
-          <View style={{backgroundColor : 'black', flex : 1}}>
+          <View style={{backgroundColor : theme.background, flex : 1}}>
 
           
           <View style={{ paddingVertical: 20, paddingHorizontal: 16 }}>
@@ -252,7 +254,7 @@ export default function GeneralPracticeComp({selectedDate,athleteCourseId,athlet
                 fontSize: 16,
                 fontWeight: '600',
                 lineHeight: 22,
-                color: 'white',
+                color: theme.text,
                 textAlign: 'center',
               }}
             >
@@ -273,8 +275,8 @@ export default function GeneralPracticeComp({selectedDate,athleteCourseId,athlet
       items={catList}
     >
       <View style={{paddingHorizontal : 16, }}>
-        <View style={{paddingVertical : 12, paddingHorizontal : 16, borderRadius : 16, backgroundColor : '#202020', flexDirection : 'row', alignItems : 'center',justifyContent : 'space-between'}}>
-            <Text style={{color : 'white', fontWeight : '500', fontSize : 16}}>{catList?.find((it)=> it.value == selectedCategoryId)?.label || 'Choose option'}</Text>
+        <View style={{paddingVertical : 12, paddingHorizontal : 16, borderRadius : 16, backgroundColor: theme.card, flexDirection : 'row', alignItems : 'center',justifyContent : 'space-between'}}>
+            <Text style={{color: theme.text, fontWeight : '500', fontSize : 16}}>{catList?.find((it)=> it.value == selectedCategoryId)?.label || 'Choose option'}</Text>
             <Image style={{width : 24, height : undefined , aspectRatio : 1}} source={require('../../assets/images/donArrr.png')}/>
         </View>
         </View>
@@ -288,9 +290,9 @@ export default function GeneralPracticeComp({selectedDate,athleteCourseId,athlet
          multiline={true}                // important
          numberOfLines={5} 
          textAlignVertical="top" 
-        style={{marginTop : 16, marginHorizontal : 16,paddingVertical : 12, paddingHorizontal : 20, borderRadius : 16, backgroundColor : '#202020',minHeight : 200,color : 'white'}}
+        style={{marginTop : 16, marginHorizontal : 16,paddingVertical : 12, paddingHorizontal : 20, borderRadius : 16, backgroundColor: theme.card,minHeight : 200,color: theme.text}}
         placeholder="Type here..."
-        placeholderTextColor={'white'}
+        placeholderTextColor={theme.placeholder}
         value={message} // <-- bind value
         onChangeText={text => setMessage(text)} // <-- update state
       />

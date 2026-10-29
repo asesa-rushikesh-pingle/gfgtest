@@ -6,6 +6,7 @@ import { BlurView } from "@react-native-community/blur";
 import styles from '../Style'
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../../context/ThemeContext';
 
 
 import Geolocation from 'react-native-geolocation-service';
@@ -14,6 +15,7 @@ export default function Footer({activeIndex = 1}) {
   const nav = useNavigation()
   const inset = useSafeAreaInsets() 
   const [location, setLocation] = useState(null);
+  const { theme } = useTheme();
 
 
   useEffect(() => {
@@ -112,7 +114,7 @@ export default function Footer({activeIndex = 1}) {
     <View style={{ position : 'absolute', bottom : 0, left : 0, right : 0, backgroundColor : 'rgba(255, 192, 203, 0)',overflow : 'hidden', zIndex : 1}}>
     <BlurView
     style={styles.absolute}
-    blurType="dark"
+    blurType={theme.blurType}
     blurAmount={3}
     // reducedTransparencyFallbackColor="white" 
   />
@@ -120,12 +122,12 @@ export default function Footer({activeIndex = 1}) {
     <TouchableOpacity onPress={()=>{
        nav.navigate('Home')
     }}>
-    <Image source={require('../../assets/images/homeico.png')} style={{ tintColor :  activeIndex == 1  ?  '#EB6925' : '#959595', width : 37, aspectRatio : 1 , height : undefined,objectFit : 'contain', borderBottomWidth : 2, borderBottomColor : true ?  '#EB6925' : 'transparent', paddingBottom : 2}}  />
+    <Image source={require('../../assets/images/homeico.png')} style={{ tintColor :  activeIndex == 1  ?  theme.accent : theme.iconInactive, width : 37, aspectRatio : 1 , height : undefined,objectFit : 'contain', borderBottomWidth : 2, borderBottomColor : true ?  theme.accent : 'transparent', paddingBottom : 2}}  />
     </TouchableOpacity>
     <TouchableOpacity onPress={()=>{
          nav.navigate('History')
     }}>
-    <Image source={require('../../assets/images/dico.png')} style={{ tintColor :  activeIndex == 2  ?  '#EB6922' : '#929595', width : 37, aspectRatio : 1 , height : undefined,objectFit : 'contain', borderBottomWidth : 2, borderBottomColor : false ?  '#EB6925' : 'transparent', paddingBottom : 2}}  />
+    <Image source={require('../../assets/images/dico.png')} style={{ tintColor :  activeIndex == 2  ?  theme.accent : theme.iconInactive, width : 37, aspectRatio : 1 , height : undefined,objectFit : 'contain', borderBottomWidth : 2, borderBottomColor : false ?  theme.accent : 'transparent', paddingBottom : 2}}  />
     </TouchableOpacity>
     <TouchableOpacity onPress={async ()=>{
 
@@ -152,17 +154,17 @@ export default function Footer({activeIndex = 1}) {
 
     }}>
        
-      <View style={{alignItems : 'center',justifyContent : 'center', padding : 14, backgroundColor : '#383838', borderRadius : 30}}>
-    <Image source={require('../../assets/images/qrico.png')} style={{ tintColor :  false ?  '#EB6925' : '#fff', width : 32, aspectRatio : 1 , height : undefined,objectFit : 'contain'}}  />
+      <View style={{alignItems : 'center',justifyContent : 'center', padding : 14, backgroundColor : theme.footerBtnBg, borderRadius : 30, borderWidth: theme.mode === 'light' ? 1 : 0, borderColor: theme.border}}>
+    <Image source={require('../../assets/images/qrico.png')} style={{ tintColor : theme.mode === 'light' ? theme.text : '#fff', width : 32, aspectRatio : 1 , height : undefined,objectFit : 'contain'}}  />
       </View>
     </TouchableOpacity>
     <TouchableOpacity>
-    <Image source={require('../../assets/images/achicoo.png')} style={{ tintColor :  false ?  '#EB6925' : '#959595', width : 37, aspectRatio : 1 , height : undefined,objectFit : 'contain', borderBottomWidth : 2, borderBottomColor : false ?  '#EB6925' : 'transparent', paddingBottom : 2}}  />
+    <Image source={require('../../assets/images/achicoo.png')} style={{ tintColor :  false ?  theme.accent : theme.iconInactive, width : 37, aspectRatio : 1 , height : undefined,objectFit : 'contain', borderBottomWidth : 2, borderBottomColor : false ?  theme.accent : 'transparent', paddingBottom : 2}}  />
     </TouchableOpacity>
     <TouchableOpacity onPress={()=>{
-      // nav.navigate('MyWeapon')
+      nav.navigate('Settings')
     }}>
-    <Image source={require('../../assets/images/settico.png')} style={{ tintColor :  false ?  '#EB6925' : '#959595', width : 37, aspectRatio : 1 , height : undefined,objectFit : 'contain', borderBottomWidth : 2, borderBottomColor : false ?  '#EB6925' : 'transparent', paddingBottom : 2}}  />
+    <Image source={require('../../assets/images/settico.png')} style={{ tintColor :  activeIndex == 5  ?  theme.accent : theme.iconInactive, width : 37, aspectRatio : 1 , height : undefined,objectFit : 'contain', borderBottomWidth : 2, borderBottomColor : false ?  theme.accent : 'transparent', paddingBottom : 2}}  />
     </TouchableOpacity>
 
   </View>

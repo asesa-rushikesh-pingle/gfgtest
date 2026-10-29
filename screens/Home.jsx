@@ -23,6 +23,7 @@ import { useIsFocused, useNavigation } from '@react-navigation/native';
 import {getData} from '../helper/callApi'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PsycologicalSkills from '../screens/components/PsycologicalSkills'
+import { useTheme } from '../context/ThemeContext';
 
 export default function Home({route}) {
   const [safeAreaHeight, setSafeAreaHeight] = useState(0);
@@ -33,6 +34,7 @@ export default function Home({route}) {
   const isFocused = useIsFocused();
 
   const [isApproved, setIsApproved] = useState(false)
+  const { theme } = useTheme();
 
 
   useEffect(() => {
@@ -87,7 +89,7 @@ export default function Home({route}) {
   
   
   return (
-    <View style={styles.parentWrapper}>
+    <View style={[styles.parentWrapper, { backgroundColor: theme.background }]}>
       <Header setSafeAreaHeight={setSafeAreaHeight} />
       {isApproved && 
       <Footer />
@@ -98,16 +100,16 @@ export default function Home({route}) {
  <ScrollView style={{ paddingTop: safeAreaHeight , height : 1400}}>
  <View style={{padding : 16}}>
    <Image source={require('../assets/images/hold.png')} style={{width : '100%', height : undefined, aspectRatio : 358/246}} />
-   <Text style={{textAlign : 'center', marginTop : 26, color : '#A8A8A8', fontSize : 20, fontWeight : '700'}}>Waiting for Approval</Text>
-   <Text style={{textAlign : 'center', marginTop : 26, color : '#656565', fontSize : 16, fontWeight : '600'}}>Your registration is under review.</Text>
+   <Text style={{textAlign : 'center', marginTop : 26, color : theme.textSecondary, fontSize : 20, fontWeight : '700'}}>Waiting for Approval</Text>
+   <Text style={{textAlign : 'center', marginTop : 26, color : theme.textMuted, fontSize : 16, fontWeight : '600'}}>Your registration is under review.</Text>
  </View>
  </ScrollView> :
  !courseObj ? 
  <ScrollView style={{ paddingTop: safeAreaHeight , height : 1400}}>
  <View style={{padding : 16}}>
    <Image source={require('../assets/images/hold.png')} style={{width : '100%', height : undefined, aspectRatio : 358/246}} />
-   <Text style={{textAlign : 'center', marginTop : 26, color : '#A8A8A8', fontSize : 20, fontWeight : '700'}}>No Courses Available</Text>
-   <Text style={{textAlign : 'center', marginTop : 26, color : '#656565', fontSize : 16, fontWeight : '600'}}>You haven’t enrolled in any courses yet.</Text>
+   <Text style={{textAlign : 'center', marginTop : 26, color : theme.textSecondary, fontSize : 20, fontWeight : '700'}}>No Courses Available</Text>
+   <Text style={{textAlign : 'center', marginTop : 26, color : theme.textMuted, fontSize : 16, fontWeight : '600'}}>You haven’t enrolled in any courses yet.</Text>
  </View>
  </ScrollView>
      : 
@@ -116,11 +118,11 @@ export default function Home({route}) {
           <View
             style={[
               styles.progressView,
-              { width: Dimensions.get('window').width - 32 },
+              { width: Dimensions.get('window').width - 32, backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border },
             ]}
           >
-            <Text style={styles.proTitle}>Course Progress</Text>
-            <Text style={styles.percenten}>{Math.floor(parseFloat(courseObj?.daysPercentage))}% </Text>
+            <Text style={[styles.proTitle, { color: theme.textSecondary }]}>Course Progress</Text>
+            <Text style={[styles.percenten, { color: theme.text }]}>{Math.floor(parseFloat(courseObj?.daysPercentage))}% </Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -129,7 +131,7 @@ export default function Home({route}) {
                 paddingBottom: 5,
                 borderBottomWidth: 0.5,
                 borderStyle: 'dashed',
-                borderBottomColor: '#A8A8A8',
+                borderBottomColor: theme.textSecondary,
               }}
             >
               {[
@@ -182,7 +184,7 @@ export default function Home({route}) {
                       height: 15,
                       flex: 1,
                       backgroundColor:
-                        (40 * Math.floor(parseFloat(courseObj?.daysPercentage)) ) / 100 >= itm ? '#EB6925' : '#383838',
+                        (40 * Math.floor(parseFloat(courseObj?.daysPercentage)) ) / 100 >= itm ? theme.accent : theme.surfaceMuted,
                       borderRadius: 3,
                     }}
                   ></View>
@@ -190,9 +192,9 @@ export default function Home({route}) {
               })}
             </View>
             <View style={styles.taLimitView}>
-              <Text style={styles.taTiLab}>0</Text>
-              <Text style={styles.taTiLab}>50</Text>
-              <Text style={styles.taTiLab}>100</Text>
+              <Text style={[styles.taTiLab, { color: theme.textSecondary }]}>0</Text>
+              <Text style={[styles.taTiLab, { color: theme.textSecondary }]}>50</Text>
+              <Text style={[styles.taTiLab, { color: theme.textSecondary }]}>100</Text>
             </View>
           </View>
         </View>
@@ -207,10 +209,10 @@ export default function Home({route}) {
           <View
             style={[
               styles.progressView,
-              { marginRight : 0,width: (Dimensions.get('window').width - 48) / 2 },
+              { marginRight : 0,width: (Dimensions.get('window').width - 48) / 2, backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border },
             ]}
           >
-            <Text style={styles.proTitle}>Your Progress</Text>
+            <Text style={[styles.proTitle, { color: theme.textSecondary }]}>Your Progress</Text>
             <Image
                 source={require('../assets/images/graph.png')}
                 style={{ width: '100%', aspectRatio: 139/55, height: undefined }}
@@ -220,13 +222,13 @@ export default function Home({route}) {
           <View
             style={[
               styles.progressView,
-              { marginRight : 0, width: (Dimensions.get('window').width - 48) / 2 },
+              { marginRight : 0, width: (Dimensions.get('window').width - 48) / 2, backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border },
             ]}
           >
-            <Text style={styles.proTitle}>Highest Achievement</Text>
+            <Text style={[styles.proTitle, { color: theme.textSecondary }]}>Highest Achievement</Text>
             <View style={styles.achBox}>
               <View>
-                <Text style={styles.firstText}>1st</Text>
+                <Text style={[styles.firstText, { color: theme.text }]}>1st</Text>
                 <Text style={styles.goldText}>Gold</Text>
               </View>
               <Image
@@ -239,18 +241,18 @@ export default function Home({route}) {
         
  
         <View style={styles.courseCardsMain}>
-          <Text style={styles.mainHead}>Welcome,</Text>
-          <Text style={styles.sunHeadingCourgfdh}>
+          <Text style={[styles.mainHead, { color: theme.text }]}>Welcome,</Text>
+          <Text style={[styles.sunHeadingCourgfdh, { color: theme.textSecondary }]}>
             Your daily training summary
           </Text>
-          <View style={styles.secCardCurse}>
+          <View style={[styles.secCardCurse, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
             <View style={styles.imgCont}>
               <Image
                 source={{uri : courseObj?.courseObject?.course_image_url}}
                 style={{ width: 96, aspectRatio: 96 / 69, height: undefined }}
               />
               <View style={styles.courseContentt}>
-                <Text style={styles.coHeadinggg}>
+                <Text style={[styles.coHeadinggg, { color: theme.text }]}>
                   {courseObj?.course_name}
                 </Text>
                 <View
@@ -261,16 +263,16 @@ export default function Home({route}) {
                     alignItems: 'center',
                   }}
                 >
-                  <Text style={styles.staMonthText}>{courseObj?.no_of_days} Days</Text>
+                  <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>{courseObj?.no_of_days} Days</Text>
                   <View
                     style={{
-                      backgroundColor: '#A8A8A8',
+                      backgroundColor: theme.textSecondary,
                       height: 5,
                       width: 5,
                       borderRadius: 5,
                     }}
                   ></View>
-                  <Text style={styles.staMonthText}>Started {courseObj?.start_date}</Text>
+                  <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>Started {courseObj?.start_date}</Text>
                 </View>
                 <View
                   style={{
@@ -291,7 +293,7 @@ export default function Home({route}) {
                       outlineOffset: 2,
                     }}
                   ></View>
-                  <Text style={styles.staMonthText}>In Progress</Text>
+                  <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>In Progress</Text>
                 </View>
               </View>
             </View>
@@ -405,7 +407,7 @@ export default function Home({route}) {
 
               <View style={styles.courseContentt}>
                 <Text
-                  style={[styles.coHeadinggg, { fontSize: 14, lineHeight: 14 }]}
+                  style={[styles.coHeadinggg, { fontSize: 14, lineHeight: 14, color: theme.text }]}
                 >
                  {itt?.coach_name}
                 </Text>
@@ -417,7 +419,7 @@ export default function Home({route}) {
                     alignItems: 'center',
                   }}
                 >
-                  <Text style={styles.staMonthText}>Head Coach</Text>
+                  <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>Head Coach</Text>
                 </View>
               </View>
             </View>
@@ -446,7 +448,7 @@ export default function Home({route}) {
 
               <View style={styles.courseContentt}>
                 <Text
-                  style={[styles.coHeadinggg, { fontSize: 14, lineHeight: 14 }]}
+                  style={[styles.coHeadinggg, { fontSize: 14, lineHeight: 14, color: theme.text }]}
                 >
                  {itt?.coach_name}
                 </Text>
@@ -458,7 +460,7 @@ export default function Home({route}) {
                     alignItems: 'center',
                   }}
                 >
-                  <Text style={styles.staMonthText}>Assistant Coach</Text>
+                  <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>Assistant Coach</Text>
                 </View>
               </View>
             </View>
@@ -490,9 +492,9 @@ export default function Home({route}) {
               source={require('../assets/images/mood.png')}
               style={{ width: 24, aspectRatio: 1, height: undefined }}
             />
-            <Text style={styles.moodLable}>Your Mood</Text>
+            <Text style={[styles.moodLable, { color: theme.text }]}>Your Mood</Text>
           </View>
-          <View style={styles.moodInner}>
+          <View style={[styles.moodInner, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
             <View
               style={{
                 flexDirection: 'row',
@@ -500,7 +502,7 @@ export default function Home({route}) {
                 justifyContent: 'space-between',
               }}
             >
-              <Text style={styles.staMonthText}>Jan 15, 2024</Text>
+              <Text style={[styles.staMonthText, { color: theme.textSecondary }]}>Jan 15, 2024</Text>
               <TouchableOpacity>
                 <Image
                   source={require('../assets/images/options.png')}
@@ -518,16 +520,16 @@ export default function Home({route}) {
             </View>
 
             <View>
-              <Text style={styles.moRegTitle}>A slightly pleasant Day</Text>
+              <Text style={[styles.moRegTitle, { color: theme.text }]}>A slightly pleasant Day</Text>
               <View style={styles.chipss}>
-                <Text style={styles.chip}>Amazed</Text>
-                <Text style={styles.chip}>Confident</Text>
-                <Text style={styles.chip}>Hopeful</Text>
-                <Text style={styles.chip}>Spirituality</Text>
-                <Text style={styles.chip}>Community</Text>
-                <Text style={styles.chip}>Amazed</Text>
-                <Text style={styles.chip}>Confident</Text>
-                <Text style={styles.chip}>Hopeful</Text>
+                <Text style={[styles.chip, { backgroundColor: theme.chip, color: theme.textSecondary }]}>Amazed</Text>
+                <Text style={[styles.chip, { backgroundColor: theme.chip, color: theme.textSecondary }]}>Confident</Text>
+                <Text style={[styles.chip, { backgroundColor: theme.chip, color: theme.textSecondary }]}>Hopeful</Text>
+                <Text style={[styles.chip, { backgroundColor: theme.chip, color: theme.textSecondary }]}>Spirituality</Text>
+                <Text style={[styles.chip, { backgroundColor: theme.chip, color: theme.textSecondary }]}>Community</Text>
+                <Text style={[styles.chip, { backgroundColor: theme.chip, color: theme.textSecondary }]}>Amazed</Text>
+                <Text style={[styles.chip, { backgroundColor: theme.chip, color: theme.textSecondary }]}>Confident</Text>
+                <Text style={[styles.chip, { backgroundColor: theme.chip, color: theme.textSecondary }]}>Hopeful</Text>
               </View>
             </View>
           </View>
@@ -540,39 +542,39 @@ export default function Home({route}) {
           <View style={styles.moodTitleBox}>
             <Image
               source={require('../assets/images/diaryico.png')}
-              style={{ width: 20, aspectRatio: 20 / 22, height: undefined }}
+              style={{ width: 20, aspectRatio: 20 / 22, height: undefined, tintColor: theme.text }}
             />
-            <Text style={styles.moodLable}>My Diary</Text>
+            <Text style={[styles.moodLable, { color: theme.text }]}>My Diary</Text>
           </View>
           <View style={{ marginTop: 16, flexDirection: 'row', columnGap: 10 }}>
-            <View style={styles.dcard}>
-              <Text style={styles.gPrasctie}>General Practice</Text>
+            <View style={[styles.dcard, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
+              <Text style={[styles.gPrasctie, { color: theme.textSecondary }]}>General Practice</Text>
               <Text
                 style={[
                   styles.gPrasctie,
-                  { color: 'white', fontSize: 20, fontWeight: '600' },
+                  { color: theme.text, fontSize: 20, fontWeight: '600' },
                 ]}
               >
                 {courseObj?.diarySummary?.general_practice}
               </Text>
             </View>
-            <View style={styles.dcard}>
-              <Text style={styles.gPrasctie}>Score Card</Text>
+            <View style={[styles.dcard, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
+              <Text style={[styles.gPrasctie, { color: theme.textSecondary }]}>Score Card</Text>
               <Text
                 style={[
                   styles.gPrasctie,
-                  { color: 'white', fontSize: 20, fontWeight: '600' },
+                  { color: theme.text, fontSize: 20, fontWeight: '600' },
                 ]}
               >
                    {courseObj?.diarySummary?.score_card}
               </Text>
             </View>
-            <View style={styles.dcard}>
-              <Text style={styles.gPrasctie}>Mental Training</Text>
+            <View style={[styles.dcard, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
+              <Text style={[styles.gPrasctie, { color: theme.textSecondary }]}>Mental Training</Text>
               <Text
                 style={[
                   styles.gPrasctie,
-                  { color: 'white', fontSize: 20, fontWeight: '600' },
+                  { color: theme.text, fontSize: 20, fontWeight: '600' },
                 ]}
               >
                   {courseObj?.diarySummary?.mental_training}

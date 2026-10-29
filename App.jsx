@@ -22,6 +22,10 @@ import Queries from "./screens/Queries"
 import QueryChat from "./screens/QueryChat"
 import WeaponCarryingLetter from "./screens/WeaponCarryingLetter"
 import WeaponCarryingLetterList from "./screens/WeaponCarryingLetterList"
+import Settings from "./screens/Settings"
+import PrivacyPolicy from "./screens/PrivacyPolicy"
+import TermsConditions from "./screens/TermsConditions"
+import { ThemeProvider } from "./context/ThemeContext"
 import { NavigationContainer } from '@react-navigation/native';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -206,7 +210,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-
+    <ThemeProvider>
     <NavigationContainer >
     <Stack.Navigator initialRouteName={initialRoute} screenOptions={{headerShown : false,animation :'scale_from_center'}}>
     <Stack.Screen name="LoginScreen" component={LoginScreen} />
@@ -227,8 +231,12 @@ export default function App() {
     <Stack.Screen name="QueryChat" component={QueryChat} />
     <Stack.Screen name="WeaponCarryingLetterList" component={WeaponCarryingLetterList} />
     <Stack.Screen name="WeaponCarryingLetter" component={WeaponCarryingLetter} />
+    <Stack.Screen name="Settings" component={Settings} />
+    <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+    <Stack.Screen name="TermsConditions" component={TermsConditions} />
     </Stack.Navigator>
     </NavigationContainer>
+    </ThemeProvider>
     </SafeAreaProvider>
 
   )

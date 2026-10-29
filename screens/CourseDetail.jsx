@@ -12,12 +12,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getData, postJSONData} from '../helper/callApi'
 import RNPickerSelect from 'react-native-picker-select';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
 
 
 export default function CourseDetail() {
   const isFocused = useIsFocused();
      const [safeAreaHeight, setSafeAreaHeight] = useState(0);
-     const nav = useNavigation() 
+     const nav = useNavigation()
+     const { theme, isDark } = useTheme() 
 
      const [selectedCourse, setSelectedCourse] = useState('')
        const [onGoingProgram, setOnGoingProgram] = useState('')
@@ -357,7 +359,7 @@ export default function CourseDetail() {
     }
 
   return (
-    <View style={styles.parentWrapper}>
+    <View style={[styles.parentWrapper, { backgroundColor: theme.background }]}>
     <TitleBar setSafeAreaHeight={setSafeAreaHeight}/>
     <Footer/>
       <ScrollView style={{paddingTop : safeAreaHeight}}>
@@ -397,11 +399,11 @@ export default function CourseDetail() {
               maxDate={moment()} 
               style={styles.calendar}
               scrollToOnSetSelectedDate={true} 
-              calendarHeaderStyle={{ color: '#fff', fontSize: 16 }}
-              dateNumberStyle={{ color: '#888' }}
-              dateNameStyle={{ color: '#888', fontSize: 10 }}
-              highlightDateNumberStyle={{ color: '#ff6a00', fontSize: 20 }}
-              highlightDateNameStyle={{ color: '#ff6a00', fontSize: 12 }}
+              calendarHeaderStyle={{ color: theme.text, fontSize: 16 }}
+              dateNumberStyle={{ color: theme.textSecondary }}
+              dateNameStyle={{ color: theme.textSecondary, fontSize: 10 }}
+              highlightDateNumberStyle={{ color: theme.accent, fontSize: 20 }}
+              highlightDateNameStyle={{ color: theme.accent, fontSize: 12 }}
               highlightDateContainerStyle={{
                 backgroundColor: 'transparent',
               }}
@@ -411,7 +413,7 @@ export default function CourseDetail() {
                 type: 'border',
                 duration: 200,
                 borderWidth: 0,
-                borderHighlightColor: '#ff6a00',
+                borderHighlightColor: theme.accent,
               }}
               selectedDate={selectedDate}
               onDateSelected={handleDateSelected}
@@ -429,7 +431,7 @@ export default function CourseDetail() {
             />
              <Text
               style={{
-                color: '#fff',
+                color: theme.text,
                 fontSize: 18,
                 textAlign: 'center',
                 marginTop: 0,
@@ -457,7 +459,7 @@ export default function CourseDetail() {
 
  <View style={{ flex: 1 }}>
         
-          <View style={{backgroundColor : 'black', flex : 1}}>
+          <View style={{backgroundColor : theme.background, flex : 1}}>
 
           
           <View style={{ paddingVertical: 20, paddingHorizontal: 16 }}>
@@ -466,7 +468,7 @@ export default function CourseDetail() {
                 fontSize: 16,
                 fontWeight: '600',
                 lineHeight: 22,
-                color: 'white', 
+                color: theme.text, 
                 textAlign: 'center',
               }}
             >
@@ -487,20 +489,20 @@ export default function CourseDetail() {
               {nestedAccourdianPrograms?.map((elem,inndexing)=>{
                 return (
                     <View  key={inndexing} style={{borderWidth : .5, borderColor : 'gray', padding : 16, marginBottom : 16, borderRadius : 16}} >
-                      <Text style={{color : 'white', textAlign : 'center', fontWeight : 400, fontSize : 16,marginBottom : 5 }} >Day {elem?.startDay} - Day {elem?.endDay}</Text>
+                      <Text style={{color : theme.text, textAlign : 'center', fontWeight : 400, fontSize : 16,marginBottom : 5 }} >Day {elem?.startDay} - Day {elem?.endDay}</Text>
 
                     
                       {elem?.categories?.map((elemm,inndexingg)=>{
                      return (<View key={inndexingg} style={{ borderTopColor : 'gray', paddingTop : 10, marginTop : 10, borderWidth : .5}}>
-                    <Text style={{color : 'white', fontSize : 16, fontWeight : '600',paddingBottom : 10}}>
+                    <Text style={{color : theme.text, fontSize : 16, fontWeight : '600',paddingBottom : 10}}>
                    {elemm?.course_category_name}
                     </Text>
                     {elemm?.all_programs?.map((ineerElem,innerIndex)=>{
                       return(
 
                       
-                    <View key={innerIndex} style={{padding : 10, marginBottom : 10, backgroundColor : ineerElem?.checked  ? '#481D07' : '#202020', borderRadius : 10, borderWidth : 1,flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between', borderColor : ineerElem?.checked ? '#EB6925' : '#202020'}}>
-                      <Text style={{color : 'white', fontSize : 14, fontWeight : '400', }}>
+                    <View key={innerIndex} style={{padding : 10, marginBottom : 10, backgroundColor : ineerElem?.checked  ? (isDark ? '#481D07' : '#FFF1E8') : theme.card, borderRadius : 10, borderWidth : 1,flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between', borderColor : ineerElem?.checked ? theme.accent : theme.border}}>
+                      <Text style={{color : theme.text, fontSize : 14, fontWeight : '400', }}>
                         {ineerElem?.program_name}
                       </Text>
 
@@ -619,7 +621,7 @@ export default function CourseDetail() {
                       }}
                     >
                       {(true) &&
-                      <Text style={styles.ongoingtext}>On Going</Text>
+                      <Text style={[styles.ongoingtext, { backgroundColor: theme.chip }]}>On Going</Text>
                       }
                    
                     </View>
@@ -649,13 +651,13 @@ export default function CourseDetail() {
                   <Text   style={styles.lnoRefText}>Lane no.</Text>
                   <Text style={styles.lnoRefTextNum}>{programDetailsObj?.lane_details ? programDetailsObj?.lane_details?.name?.split(' ')[1] : '--'}</Text>
                 </TouchableOpacity>
-                <View style={styles.chchvdeyai}>
-                  <Text style={styles.dchtegray}>Check In</Text>
-                  <Text style={styles.dchtegraytm}>{programDetailsObj?.display_login_time || '--'}</Text>
+                <View style={[styles.chchvdeyai, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
+                  <Text style={[styles.dchtegray, { color: theme.textSecondary }]}>Check In</Text>
+                  <Text style={[styles.dchtegraytm, { color: theme.text }]}>{programDetailsObj?.display_login_time || '--'}</Text>
                 </View>
-                <View style={styles.chchvdeyai}>
-                  <Text style={styles.dchtegray}>Check Out</Text>
-                  <Text style={styles.dchtegraytm}>{programDetailsObj?.display_logout_time || '--'}</Text>
+                <View style={[styles.chchvdeyai, { backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }]}>
+                  <Text style={[styles.dchtegray, { color: theme.textSecondary }]}>Check Out</Text>
+                  <Text style={[styles.dchtegraytm, { color: theme.text }]}>{programDetailsObj?.display_logout_time || '--'}</Text>
                   {programDetailsObj?.logoutProgram && 
                   <TouchableOpacity style={{position : 'absolute', top : '35%', right : 10}} onPress={()=>{
                     Alert.alert(
@@ -690,8 +692,8 @@ export default function CourseDetail() {
             <View style={{paddingHorizontal : 16}}>
               {groupWeekDetails(weekDetails)?.map((category, cIdx)=>{
                 return (
-                  <View key={cIdx} style={styles.mentalTraiView}>
-                    <Text style={styles.coHeadinggg}>{category?.category_name}</Text>
+                  <View key={cIdx} style={[styles.mentalTraiView, { borderColor: theme.border, backgroundColor: theme.card }]}>
+                    <Text style={[styles.coHeadinggg, { color: theme.text }]}>{category?.category_name}</Text>
 
                     {category?.weeks?.map((week, wIdx)=>{
                       const weekKey = `${cIdx}-${wIdx}`
@@ -707,20 +709,20 @@ export default function CourseDetail() {
                             }}
                             style={{flexDirection : 'row', alignItems : 'center', columnGap : 8}}
                           >
-                            <Text style={{color : 'white', fontSize : 16, fontWeight : '600'}}>
+                            <Text style={{color : theme.text, fontSize : 16, fontWeight : '600'}}>
                               {isWeekExpanded ? '▼' : '▶'}
                             </Text>
-                            <Text style={{color : 'white', fontSize : 16, fontWeight : '600'}}>Week {week?.week_number}</Text>
+                            <Text style={{color : theme.text, fontSize : 16, fontWeight : '600'}}>Week {week?.week_number}</Text>
                           </TouchableOpacity>
 
                           {isWeekExpanded && week?.days?.map((dayItem, dIdx)=>{
                             const isCompleted = dayItem?.is_completed || dayItem?.completed
                             const canComplete = !!dayItem?.canComplete
                             return (
-                              <View key={dIdx} style={{padding : 10, marginTop : 10, backgroundColor : '#202020', borderRadius : 10, flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between'}}>
-                                <Text style={[styles.codescr, {flex : 1, marginRight : 8}]}>Day {dayItem?.day} , {dayItem?.program_name}</Text>
+                              <View key={dIdx} style={{padding : 10, marginTop : 10, backgroundColor : theme.cardAlt, borderRadius : 10, borderWidth: 1, borderColor: theme.border, flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between'}}>
+                                <Text style={[styles.codescr, {flex : 1, marginRight : 8, color: theme.text}]}>Day {dayItem?.day} , {dayItem?.program_name}</Text>
                                 {isCompleted ?
-                                  <Text style={styles.ongoingtext}>Completed</Text>
+                                  <Text style={[styles.ongoingtext, { backgroundColor: theme.chip }]}>Completed</Text>
                                 :
                                   <TouchableOpacity
                                     disabled={!canComplete}
@@ -746,7 +748,7 @@ export default function CourseDetail() {
 
 
                                    
-                                  }} style={{paddingVertical : 4, paddingHorizontal : 8, backgroundColor : canComplete ? '#EB6925' : '#555555', borderRadius : 6, opacity : canComplete ? 1 : 0.6}}>
+                                  }} style={{paddingVertical : 4, paddingHorizontal : 8, backgroundColor : canComplete ? theme.accent : theme.surfaceMuted, borderRadius : 6, opacity : canComplete ? 1 : 0.6}}>
                                     <Text style={{color : canComplete ? 'black' : '#AAAAAA', fontSize : 12, fontWeight : '600'}}>Mark as Complete</Text>
                                   </TouchableOpacity>
                                 }
@@ -761,16 +763,16 @@ export default function CourseDetail() {
               })}
 
               {customPrograms?.length > 0 &&
-                <View style={styles.mentalTraiView}>
-                  <Text style={styles.coHeadinggg}>Custom Programs</Text>
+                <View style={[styles.mentalTraiView, { borderColor: theme.border, backgroundColor: theme.card }]}>
+                  <Text style={[styles.coHeadinggg, { color: theme.text }]}>Custom Programs</Text>
                   {customPrograms?.map((program, pIdx)=>{
                     const isCompleted = program?.is_completed || program?.completed
                     const canComplete = !!program?.canComplete
                     return (
-                      <View key={pIdx} style={{padding : 10, marginTop : 10, backgroundColor : '#202020', borderRadius : 10, flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between'}}>
-                        <Text style={[styles.codescr, {flex : 1, marginRight : 8}]}>{program?.program_name}</Text>
+                      <View key={pIdx} style={{padding : 10, marginTop : 10, backgroundColor : theme.cardAlt, borderRadius : 10, borderWidth: 1, borderColor: theme.border, flexDirection : 'row', alignItems : 'center', justifyContent : 'space-between'}}>
+                        <Text style={[styles.codescr, {flex : 1, marginRight : 8, color: theme.text}]}>{program?.program_name}</Text>
                         {isCompleted ?
-                          <Text style={styles.ongoingtext}>Completed</Text>
+                          <Text style={[styles.ongoingtext, { backgroundColor: theme.chip }]}>Completed</Text>
                         :
                           <TouchableOpacity
                             disabled={!canComplete}
@@ -795,7 +797,7 @@ export default function CourseDetail() {
                             );
 
 
-                          }} style={{paddingVertical : 4, paddingHorizontal : 8, backgroundColor : canComplete ? '#EB6925' : '#555555', borderRadius : 6, opacity : canComplete ? 1 : 0.6}}>
+                          }} style={{paddingVertical : 4, paddingHorizontal : 8, backgroundColor : canComplete ? theme.accent : theme.surfaceMuted, borderRadius : 6, opacity : canComplete ? 1 : 0.6}}>
                             <Text style={{color : canComplete ? 'black' : '#AAAAAA', fontSize : 12, fontWeight : '600'}}>Mark as Complete</Text>
                           </TouchableOpacity>
                         }
