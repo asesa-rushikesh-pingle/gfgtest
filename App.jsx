@@ -37,8 +37,8 @@ import TitleBar from './screens/components/TitleBar'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import {PermissionsAndroid} from 'react-native';
-import messaging from '@react-native-firebase/messaging';
+import {PermissionsAndroid, Platform} from 'react-native';
+import messaging from './helper/firebaseMessaging';
 
 import notifee from '@notifee/react-native';
 
@@ -60,12 +60,18 @@ export default function App() {
 
 
   useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
     // Check if permission is already granted before requesting
     requestAndroidPermissionsFn();
 
   }, [])
 
   useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
       
@@ -78,7 +84,9 @@ export default function App() {
   }, []);
 
   async function requestAndroidPermissionsFn() {
-
+    if (Platform.OS !== 'android') {
+      return;
+    }
 
     let granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
     while (granted !== PermissionsAndroid.RESULTS.GRANTED) {
@@ -100,6 +108,9 @@ export default function App() {
   } 
 
   async function selfFn(tit,body) {
+    if (Platform.OS !== 'android') {
+      return;
+    }
     // Request permissions (required for iOS)
     await notifee.requestPermission()
 

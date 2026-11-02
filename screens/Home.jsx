@@ -25,19 +25,61 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import PsycologicalSkills from '../screens/components/PsycologicalSkills'
 import { useTheme } from '../context/ThemeContext';
 import moment from 'moment';
-import { competitions, getLevelColor } from '../constants/competitions';
+import { getLevelColor } from '../constants/competitions';
+
+function mapLatestCompetition(apiCompetition) {
+  if (!apiCompetition) {
+    return null;
+  }
+
+  const venue = [
+    apiCompetition.address_line_1,
+    apiCompetition.address_line_2,
+    apiCompetition.city,
+    apiCompetition.country,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+  return {
+    id: apiCompetition.id,
+    host_branch_id: apiCompetition.host_branch_id,
+    name: apiCompetition.competition_name,
+    from_date: apiCompetition.from_date,
+    to_date: apiCompetition.to_date,
+    display_date_from_date: apiCompetition.display_date_from_date,
+    display_date_to_date: apiCompetition.display_date_to_date,
+    level: apiCompetition.competition_level_name,
+    venue: venue || '--',
+    description:
+      apiCompetition.competition_flag
+        ? `${apiCompetition.competition_flag} competition with ${apiCompetition.no_of_events || 0} event(s). Tap to view events and apply.`
+        : 'New competition added. Tap to view events and apply.',
+    competition_flag: apiCompetition.competition_flag,
+    scoring: apiCompetition.scoring,
+    competition_pic_url: apiCompetition.competition_pic_url,
+    events: (apiCompetition.events || []).map(event => ({
+      id: event.id,
+      name: event.event_name,
+      date: event.event_date,
+      scoring: apiCompetition.scoring || '--',
+      can_apply: event.can_apply,
+      apply_status: event.apply_status,
+    })),
+  };
+}
 
 export default function Home({route}) {
   const [safeAreaHeight, setSafeAreaHeight] = useState(0);
   const navigation = useNavigation();
   const [courseObj, setCourseObj] = useState('')
   const [onGoingProgram, setOnGoingProgram] = useState('')
+  const [latestCompetition, setLatestCompetition] = useState(null)
 
   const isFocused = useIsFocused();
 
   const [isApproved, setIsApproved] = useState(false)
   const { theme, isDark } = useTheme();
-  const latestCompetition = competitions?.[0];
   const latestLevelColor = getLevelColor(latestCompetition?.level);
 
 
@@ -45,6 +87,7 @@ export default function Home({route}) {
     const controller = new AbortController();
     if(isFocused){
       getCourseDataFn(controller)
+      getLatestCompetitionFn(controller)
     } 
     return ()=>{
       controller.abort();
@@ -87,6 +130,16 @@ export default function Home({route}) {
       
       // athleteCourseIdForGeneralCheckin
       console.log("course details ",respo.data.course)
+    }
+  }
+
+  async function getLatestCompetitionFn(controller) {
+    const branch = await AsyncStorage.getItem('branch_slug')
+    const respo = await getData(branch, '/athlete/competition/latest', {}, controller)
+    if (respo?.status && respo?.data?.competition) {
+      setLatestCompetition(mapLatestCompetition(respo.data.competition))
+    } else {
+      setLatestCompetition(null)
     }
   }
 
@@ -494,6 +547,7 @@ export default function Home({route}) {
               onPress={() => {
                 navigation.navigate('CompetitionDetail', {
                   competitionId: latestCompetition.id,
+                  hostBranchId: latestCompetition.host_branch_id,
                 });
               }}
               style={{
@@ -547,7 +601,7 @@ export default function Home({route}) {
                         letterSpacing: 0.3,
                       }}
                     >
-                      NEW
+                      {(latestCompetition.competition_flag || 'NEW').toUpperCase()}
                     </Text>
                   </View>
                   <Text
@@ -617,7 +671,7 @@ export default function Home({route}) {
                 }}
                 numberOfLines={2}
               >
-                New competition added. Tap to view events and apply.
+                {latestCompetition.description}
               </Text>
 
               <View
@@ -634,8 +688,10 @@ export default function Home({route}) {
                     fontWeight: '600',
                   }}
                 >
-                  {moment(latestCompetition.from_date).format('DD MMM')} -{' '}
-                  {moment(latestCompetition.to_date).format('DD MMM YYYY')}
+                  {latestCompetition.display_date_from_date &&
+                  latestCompetition.display_date_to_date
+                    ? `${latestCompetition.display_date_from_date} - ${latestCompetition.display_date_to_date}`
+                    : `${moment(latestCompetition.from_date).format('DD MMM')} - ${moment(latestCompetition.to_date).format('DD MMM YYYY')}`}
                 </Text>
                 <Text
                   style={{

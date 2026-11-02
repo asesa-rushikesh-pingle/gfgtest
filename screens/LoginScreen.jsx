@@ -8,7 +8,7 @@ import {baseUrl} from '../constants/variables'
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import messaging from '@react-native-firebase/messaging';
+import messaging from '../helper/firebaseMessaging';
 
 // import Tts from 'react-native-tts';
 
@@ -75,8 +75,15 @@ export default function LoginScreen() {
 
     async function veryOtpfn(txt) {
 
-        const fctoken = await messaging().getToken();
-        console.log("FCM TOKEN:", fctoken);
+        let fctoken = '';
+        if (Platform.OS === 'android') {
+            try {
+                fctoken = await messaging().getToken();
+                console.log("FCM TOKEN:", fctoken);
+            } catch (e) {
+                console.log('FCM token error', e);
+            }
+        }
 
         
      

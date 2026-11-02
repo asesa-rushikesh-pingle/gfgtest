@@ -5,15 +5,18 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  RefreshControl,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import TitleBar from './components/TitleBar';
 import Footer from './components/Footer';
 import styles from './Style';
 import moment from 'moment';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
-import { competitions, getLevelColor } from '../constants/competitions';
+import { getLevelColor } from '../constants/competitions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getData } from '../helper/callApi';
 
 function formatDate(value) {
   if (!value) {
@@ -22,10 +25,77 @@ function formatDate(value) {
   return moment(value).format('DD MMM YYYY');
 }
 
+function mapCompetitionListItem(item) {
+  if (!item) {
+    return null;
+  }
+
+  return {
+    id: item.competition_id,
+    host_branch_id: item.host_branch_id,
+    name: item.competition_name,
+    from_date: item.from_date,
+    to_date: item.to_date,
+    display_date_from_date: item.display_date_from_date,
+    display_date_to_date: item.display_date_to_date,
+    level: item.competition_level_name,
+    venue: item.city || item.host_branch_name || '--',
+    competition_flag: item.competition_flag,
+    no_of_events: item.no_of_events || 0,
+    host_branch_name: item.host_branch_name,
+    is_internal: item.is_internal,
+    is_own_branch: item.is_own_branch,
+    description: item.competition_flag
+      ? `${item.competition_flag} competition hosted by ${item.host_branch_name || 'academy'}`
+      : 'Open competition. Tap to view details and apply.',
+    events: [],
+  };
+}
+
 export default function CompetitionList() {
   const [safeAreaHeight, setSafeAreaHeight] = useState(0);
+  const [competitions, setCompetitions] = useState([]);
+  const [upcomingDays, setUpcomingDays] = useState(30);
+  const [isLoading, setIsLoading] = useState(false);
   const nav = useNavigation();
+  const isFocused = useIsFocused();
+  const listControllerRef = useRef(null);
   const { theme, isDark } = useTheme();
+
+  useEffect(() => {
+    if (isFocused) {
+      getCompetitionListFn();
+    }
+    return () => {
+      listControllerRef.current?.abort();
+    };
+  }, [isFocused]);
+
+  async function getCompetitionListFn() {
+    listControllerRef.current?.abort();
+    const controller = new AbortController();
+    listControllerRef.current = controller;
+
+    setIsLoading(true);
+    const branch = await AsyncStorage.getItem('branch_slug');
+    const respo = await getData(
+      branch,
+      '/athlete/competition/open-list',
+      { upcoming_days: 30 },
+      controller,
+    );
+    setIsLoading(false);
+
+    if (respo?.status) {
+      const mapped = (respo?.data?.competitionList || [])
+        .map(mapCompetitionListItem)
+        .filter(Boolean);
+      setCompetitions(mapped);
+      setUpcomingDays(respo?.data?.upcomingDays || 30);
+    } else {
+      setCompetitions([]);
+    }
+  }
 
   return (
     <View style={[styles.parentWrapper, { backgroundColor: theme.background }]}>
@@ -35,6 +105,13 @@ export default function CompetitionList() {
       <ScrollView
         style={{ paddingTop: safeAreaHeight }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={getCompetitionListFn}
+            tintColor={theme.accent}
+          />
+        }
       >
         <View style={{ paddingHorizontal: 16, marginTop: 18 }}>
           <View
@@ -53,9 +130,24 @@ export default function CompetitionList() {
               Explore competitions and apply for events
             </Text>
             <Text style={[localStyles.heroSub, { color: theme.textSecondary }]}>
-              {competitions.length} competitions available across academy to international levels
+              {competitions.length} competition
+              {competitions.length === 1 ? '' : 's'} open in the next {upcomingDays} days
             </Text>
           </View>
+
+          {competitions.length === 0 && !isLoading && (
+            <Text
+              style={{
+                color: theme.textSecondary,
+                textAlign: 'center',
+                marginTop: 40,
+                fontSize: 15,
+                fontWeight: '600',
+              }}
+            >
+              No open competitions found
+            </Text>
+          )}
 
           {competitions.map((item) => {
             const levelColor = getLevelColor(item.level);
@@ -64,7 +156,10 @@ export default function CompetitionList() {
                 key={item.id}
                 activeOpacity={0.85}
                 onPress={() =>
-                  nav.navigate('CompetitionDetail', { competitionId: item.id })
+                  nav.navigate('CompetitionDetail', {
+                    competitionId: item.id,
+                    hostBranchId: item.host_branch_id,
+                  })
                 }
                 style={[
                   localStyles.card,
@@ -75,21 +170,38 @@ export default function CompetitionList() {
                 ]}
               >
                 <View style={localStyles.cardTop}>
-                  <View
-                    style={[
-                      localStyles.levelChip,
-                      {
-                        backgroundColor: isDark ? `${levelColor}22` : `${levelColor}18`,
-                        borderColor: `${levelColor}55`,
-                      },
-                    ]}
-                  >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     <View
-                      style={[localStyles.levelDot, { backgroundColor: levelColor }]}
-                    />
-                    <Text style={[localStyles.levelText, { color: levelColor }]}>
-                      {item.level}
-                    </Text>
+                      style={[
+                        localStyles.levelChip,
+                        {
+                          backgroundColor: isDark ? `${levelColor}22` : `${levelColor}18`,
+                          borderColor: `${levelColor}55`,
+                        },
+                      ]}
+                    >
+                      <View
+                        style={[localStyles.levelDot, { backgroundColor: levelColor }]}
+                      />
+                      <Text style={[localStyles.levelText, { color: levelColor }]}>
+                        {item.level}
+                      </Text>
+                    </View>
+                    {!!item.competition_flag && (
+                      <View
+                        style={[
+                          localStyles.flagChip,
+                          {
+                            backgroundColor: theme.chip,
+                            borderColor: theme.border,
+                          },
+                        ]}
+                      >
+                        <Text style={[localStyles.flagText, { color: theme.textSecondary }]}>
+                          {item.competition_flag}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                   <Image
                     source={require('../assets/icons/expand.png')}
@@ -105,6 +217,17 @@ export default function CompetitionList() {
                   {item.name}
                 </Text>
 
+                {(item.venue || item.host_branch_name) && (
+                  <Text
+                    style={[localStyles.venueText, { color: theme.textMuted }]}
+                    numberOfLines={1}
+                  >
+                    {[item.venue, item.host_branch_name ? `Host: ${item.host_branch_name}` : null]
+                      .filter(Boolean)
+                      .join('  ·  ')}
+                  </Text>
+                )}
+
                 <View style={localStyles.metaRow}>
                   <View
                     style={[
@@ -119,7 +242,7 @@ export default function CompetitionList() {
                       From
                     </Text>
                     <Text style={[localStyles.dateValue, { color: theme.text }]}>
-                      {formatDate(item.from_date)}
+                      {item.display_date_from_date || formatDate(item.from_date)}
                     </Text>
                   </View>
                   <View
@@ -135,14 +258,14 @@ export default function CompetitionList() {
                       To
                     </Text>
                     <Text style={[localStyles.dateValue, { color: theme.text }]}>
-                      {formatDate(item.to_date)}
+                      {item.display_date_to_date || formatDate(item.to_date)}
                     </Text>
                   </View>
                 </View>
 
                 <View style={localStyles.footerRow}>
                   <Text style={[localStyles.eventCount, { color: theme.textSecondary }]}>
-                    {item.events?.length || 0} Events
+                    {item.no_of_events} Event{item.no_of_events === 1 ? '' : 's'}
                   </Text>
                   <Text style={[localStyles.viewDetails, { color: theme.accent }]}>
                     View details
@@ -152,8 +275,7 @@ export default function CompetitionList() {
             );
           })}
         </View>
-        <View style={{height : 100}}></View>
-
+        <View style={{ height: 100 }} />
 
         <View style={{ marginBottom: 180 }} />
       </ScrollView>
@@ -215,10 +337,25 @@ const localStyles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
+  flagChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  flagText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
   name: {
     fontSize: 17,
     fontWeight: '700',
     lineHeight: 24,
+    marginBottom: 6,
+  },
+  venueText: {
+    fontSize: 12,
+    fontWeight: '500',
     marginBottom: 14,
   },
   metaRow: {
