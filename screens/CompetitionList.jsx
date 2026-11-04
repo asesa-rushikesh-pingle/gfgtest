@@ -100,11 +100,13 @@ export default function CompetitionList() {
   return (
     <View style={[styles.parentWrapper, { backgroundColor: theme.background }]}>
       <TitleBar title={'Competitions'} setSafeAreaHeight={setSafeAreaHeight} />
-      <Footer activeIndex={4} />
 
       <ScrollView
-        style={{ paddingTop: safeAreaHeight }}
+        style={{ flex: 1, paddingTop: safeAreaHeight }}
+        contentContainerStyle={{ paddingBottom: 180 }}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+        keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
@@ -275,10 +277,9 @@ export default function CompetitionList() {
             );
           })}
         </View>
-        <View style={{ height: 100 }} />
-
-        <View style={{ marginBottom: 180 }} />
       </ScrollView>
+
+      <Footer activeIndex={4} />
     </View>
   );
 }

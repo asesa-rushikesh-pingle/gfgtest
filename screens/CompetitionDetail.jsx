@@ -8,12 +8,15 @@ import {
   ActivityIndicator,
   RefreshControl,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import TitleBar from './components/TitleBar';
 import styles from './Style';
 import moment from 'moment';
 import { useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { getLevelColor } from '../constants/competitions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -102,6 +105,7 @@ export default function CompetitionDetail() {
   const [savingScoreEventId, setSavingScoreEventId] = useState(null);
   const [scoreForms, setScoreForms] = useState({});
   const route = useRoute();
+  const inset = useSafeAreaInsets();
   const { theme, isDark } = useTheme();
   const controllerRef = useRef(null);
 
@@ -178,6 +182,24 @@ export default function CompetitionDetail() {
     }
   }
 
+  function confirmApplyEvent(event) {
+    if (!event?.can_apply || applyingEventId) {
+      return;
+    }
+
+    Alert.alert(
+      'Confirm Apply',
+      `Do you want to apply for "${event.name}"?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Apply',
+          onPress: () => onApplyEvent(event),
+        },
+      ],
+    );
+  }
+
   async function onApplyEvent(event) {
     if (!event?.can_apply || applyingEventId) {
       return;
@@ -198,7 +220,7 @@ export default function CompetitionDetail() {
     }
   }
 
-  async function onSaveScore(event) {
+  function confirmSaveScore(event) {
     if (!event?.can_update_score || savingScoreEventId) {
       return;
     }
@@ -213,6 +235,24 @@ export default function CompetitionDetail() {
     }
     if (form.rank === '' || Number.isNaN(rank) || !Number.isInteger(rank) || rank < 1) {
       Alert.alert('Invalid rank', 'Please enter a valid rank.');
+      return;
+    }
+
+    Alert.alert(
+      'Confirm Save',
+      `Save score ${score} and rank ${rank} for "${event.name}"?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Save',
+          onPress: () => onSaveScore(event, score, rank),
+        },
+      ],
+    );
+  }
+
+  async function onSaveScore(event, score, rank) {
+    if (!event?.can_update_score || savingScoreEventId) {
       return;
     }
 
@@ -263,10 +303,16 @@ export default function CompetitionDetail() {
     <View style={[styles.parentWrapper, { backgroundColor: theme.background }]}>
       <TitleBar title={'Competition Details'} setSafeAreaHeight={setSafeAreaHeight} />
 
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
       <ScrollView
-        style={{ paddingTop: safeAreaHeight }}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        style={{ flex: 1, paddingTop: safeAreaHeight }}
+        contentContainerStyle={{ paddingBottom: inset.bottom + 40 }}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
         refreshControl={
           <RefreshControl
             refreshing={isLoading}
@@ -550,7 +596,7 @@ export default function CompetitionDetail() {
                     <TouchableOpacity
                       activeOpacity={0.85}
                       disabled={!!savingScoreEventId}
-                      onPress={() => onSaveScore(event)}
+                      onPress={() => confirmSaveScore(event)}
                       style={[
                         localStyles.applyBtn,
                         {
@@ -573,7 +619,7 @@ export default function CompetitionDetail() {
                   <TouchableOpacity
                     activeOpacity={0.85}
                     disabled={!!applyingEventId}
-                    onPress={() => onApplyEvent(event)}
+                    onPress={() => confirmApplyEvent(event)}
                     style={[
                       localStyles.applyBtn,
                       {
@@ -597,6 +643,7 @@ export default function CompetitionDetail() {
           <View style={{ height: 40 }} />
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
